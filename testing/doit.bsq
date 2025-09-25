@@ -16,7 +16,7 @@ public function main(): Bool {
 *%
 
 
-public function main(): Bool { return KeyComparator::less<CString>(largeString1, largeString1); }
+public function main(): Bool { return KeyComparator::less<CString>(largeString2, largeString1); }
 
 
 

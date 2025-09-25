@@ -1,0 +1,5 @@
+declare namespace Main;
+
+public function main(): Bool {
+    return true;
+}
