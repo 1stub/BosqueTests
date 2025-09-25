@@ -5,12 +5,13 @@ cwd=$(pwd)
 bosque=$cwd/../../BosqueCore
 cpp=$bosque/bin/src/cmd/analyzecpp.js
 
-src=$1
+src=server.bsq
 cppout=$cwd/cppout
 
-if [[ $# -eq 0 ]]; then
-    echo "No input file provided!"
-    exit 1
+build=dev
+
+if [[ $1 -eq "release" ]]; then 
+    build=release
 fi
 
 function cleanup() {
@@ -26,7 +27,5 @@ node $cpp $src
 
 cd $cppout
 make clean
-make
+make BUILD=$build
 ./output/memex
-
-cleanup

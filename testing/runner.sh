@@ -28,5 +28,3 @@ cd $cppout
 make clean
 make
 ./output/memex
-
-cleanup
