@@ -1,0 +1,928 @@
+declare namespace Main;
+
+%%
+%% Program that builds nbody, raytrace, and db with intention
+%% of user injecting c++ code for GC testing
+%%
+
+
+%%
+%%This is a bosque nbody implementation of https://benchmarksgame-team.pages.debian.net/benchmarksgame/performance/nbody.html.
+%%
+
+entity Position {
+    field x: Float;
+    field y: Float;
+    field z: Float;
+}
+
+entity Velocity {
+    field vx: Float;
+    field vy: Float;
+    field vz: Float;
+}
+
+entity Body {
+    const solar_mass: Float = 4.0f * Float::pi * Float::pi;
+    const days_per_year: Float = 365.24f;
+
+    field name: CString;
+    field mass: Float;
+    field pos: Position;
+    field vel: Velocity;
+
+    const jupiter: Body = Body{
+        'j',
+        0.000954791938424326609f * Body::solar_mass,
+        Position{
+            4.84143144246472090f,
+            -1.16032004402742839f,
+            -0.103622044471123109f
+        },
+        Velocity{
+            0.00166007664274403694f * Body::days_per_year,
+            0.00769901118419740425f * Body::days_per_year,
+            -0.0000690460016972063023f * Body::days_per_year
+        }
+    };
+
+    const saturn: Body = Body{
+        's',
+        0.000285885980666130812f * Body::solar_mass,
+        Position{
+            8.34336671824457987f,
+            4.12479856412430479f,
+            -0.403523417114321381f
+        },
+        Velocity{
+            -0.00276742510726862411f * Body::days_per_year,
+            0.00499852801234917238f * Body::days_per_year,
+            0.0000230417297573763929f * Body::days_per_year
+        }
+    };
+
+    const uranus: Body = Body{
+        'u',
+        0.0000436624404335156298f * Body::solar_mass,
+        Position{
+            12.8943695621391310f,
+            -15.1111514016986312f,
+            -0.223307578892655734f
+        },
+        Velocity{
+            0.00296460137564761618f * Body::days_per_year,
+            0.00237847173959480950f * Body::days_per_year,
+            -0.0000296589568540237556f * Body::days_per_year
+        }
+    };
+
+    const neptune: Body = Body{
+        'n',
+        0.0000515138902046611451f * Body::solar_mass,
+        Position{
+            15.3796971148509165f,
+            -25.9193146099879641f,
+            0.179258772950371181f
+        },
+        Velocity{
+            0.00268067772490389322f * Body::days_per_year,
+            0.00162824170038242295f * Body::days_per_year,
+            -0.0000951592254519715870f * Body::days_per_year
+        }
+    };
+
+    const sun: Body = Body{
+        'su',
+        Body::solar_mass,
+        Position{
+            0.0f,
+            0.0f,
+            0.0f
+        },
+        Velocity{
+            0.0f,
+            0.0f,
+            0.0f
+        }
+    };
+
+    method offsetMomentum(px: Float, py: Float, pz: Float): Body {
+        return Body{
+            this.name,
+            this.mass,
+            this.pos, 
+            Velocity{
+                -px // Body::solar_mass, 
+                -py // Body::solar_mass, 
+                -pz // Body::solar_mass
+            }
+        };
+    }
+
+    method kineticEnergy(): Float {
+        return 0.5f * this.mass * (Float::square(this.vel.vx) + Float::square(this.vel.vy) + Float::square(this.vel.vz));
+    }
+
+    function distance(b0: Body, b1: Body): Float {
+        let dx = b0.pos.x - b1.pos.x;
+        let dy = b0.pos.y - b1.pos.y;
+        let dz = b0.pos.z - b1.pos.z;
+
+        return Float::sqrt(Float::square(dx) + Float::square(dy) + Float::square(dz));
+    }
+}
+
+entity NBodySystem {
+    field bodies: List<Body>;
+   
+    const energypairs: List<List<(|Nat, Nat|)>> = List<List<(|Nat, Nat|)>>{
+        List<(|Nat, Nat|)>{(|0n, 1n|), (|0n, 2n|), (|0n, 3n|), (|0n, 4n|)},
+        List<(|Nat, Nat|)>{(|1n, 2n|), (|1n, 3n|), (|1n, 4n|)},
+        List<(|Nat, Nat|)>{(|2n, 3n|), (|2n, 4n|)},
+        List<(|Nat, Nat|)>{(|3n, 4n|)}
+    };
+
+    function create(): NBodySystem {
+        let planets = List<Body>{
+            Body::jupiter,
+            Body::saturn,
+            Body::uranus,
+            Body::neptune
+        };
+
+        let px = planets.map<Float>(fn(p: Body): Float => p.vel.vx * p.mass).sum();
+        let py = planets.map<Float>(fn(p: Body): Float => p.vel.vy * p.mass).sum();
+        let pz = planets.map<Float>(fn(p: Body): Float => p.vel.vz * p.mass).sum();
+
+        let allbodies = List<Body>{
+            Body::sun.offsetMomentum(px, py, pz),
+            Body::jupiter,
+            Body::saturn,
+            Body::uranus,
+            Body::neptune
+        };
+
+        return NBodySystem{ allbodies };
+    }
+
+    method potentialEnergyCompute(ppairs: List<(|Nat, Nat|)>): Float {
+        let potentialEnergies = ppairs.map<Float>(fn(bp: (|Nat, Nat|)): Float => {
+            let b0 = this.bodies.get(bp.0);
+            let b1 = this.bodies.get(bp.1);
+
+            return (b0.mass * b1.mass) // Body::distance(b0, b1);
+        });
+
+        return potentialEnergies.sum();
+    }
+
+    method energy(): Float {
+        let keneticEnergies = this.bodies.map<Float>(fn(b: Body): Float => b.kineticEnergy());
+        let potentialEnergies = NBodySystem::energypairs.map<Float>(fn(pep: List<(|Nat, Nat|)>): Float => {
+            return this.potentialEnergyCompute(pep);
+        });
+
+        return keneticEnergies.sum() - potentialEnergies.sum();
+    }
+
+    method advance(dt: Float): NBodySystem {
+        let deltav = this.bodies.map<(|Body, Float, Float, Float|)>(fn(b: Body): (|Body, Float, Float, Float|) => {
+            let forces = this.bodies.map<(|Float, Float, Float|)>(fn(ob: Body): (|Float, Float, Float|) => {
+                if(b.name === ob.name) {
+                    return (|0.0f, 0.0f, 0.0f|);
+                }
+                else {
+                    let dx = ob.pos.x - b.pos.x;
+                    let dy = ob.pos.y - b.pos.y;
+                    let dz = ob.pos.z - b.pos.z;
+
+                    let distance = Body::distance(ob, b);
+                    let mag = dt // (distance * distance * distance);
+
+                    return (|dx * ob.mass * mag, dy * ob.mass * mag, dz * ob.mass * mag|);
+                }
+            });
+
+            let fx = b.vel.vx + forces.map<Float>(fn(fv: (|Float, Float, Float|)): Float => fv.0).sum();
+            let fy = b.vel.vy + forces.map<Float>(fn(fv: (|Float, Float, Float|)): Float => fv.1).sum();
+            let fz = b.vel.vz + forces.map<Float>(fn(fv: (|Float, Float, Float|)): Float => fv.2).sum();
+
+            return (|b, fx, fy, fz|);
+        });
+
+        let bodies = deltav.map<Body>(fn(utuple: (|Body, Float, Float, Float|)): Body => {
+            let b = utuple.0;
+
+            let nvx = utuple.1;
+            let nvy = utuple.2;
+            let nvz = utuple.3;
+            let nvel = Velocity{nvx, nvy, nvz};
+
+            let nx = b.pos.x + (nvx * dt);
+            let ny = b.pos.y + (nvy * dt);
+            let nz = b.pos.z + (nvz * dt);
+            let npos = Position{nx, ny, nz};
+
+            return Body{b.name, b.mass, npos, nvel};
+        });
+
+        return NBodySystem{ bodies };
+    }
+}
+
+function nbody_run(): Nat {
+    var system = NBodySystem::create();
+    let step = 0.01f;
+
+    system = system.advance(step);
+
+    return 1n;
+}
+
+%*
+A sample Database application -- adapted from SPEC JVM benchmark
+*%
+
+%** An entry in the database **%
+entity Entry {
+    field items: List<CString>;
+}
+
+entity FormatEntry {
+    field header: CString;
+    field entries: List<CString>;
+
+    method format(values: List<CString>): CString {
+        let parts = this.entries.mapIdx<CString>(fn(vv, ii) => CString::concat(vv, ': ', values.get(ii)));
+        let iidt = CString::joinAll('%n;  ', parts);
+
+        let hdr = CString::concat(this.header, '%n;');
+        return CString::concat(hdr, '  ', iidt);
+    }
+}
+
+%** The Format of the current Database --  **%
+entity Format {
+    field entries: List<FormatEntry>;
+    field vcount: Nat;
+
+    invariant $vcount == $entries.map<Nat>(fn(ee) => ee.entries.size()).sum();
+
+    method formatEntry(entry: Entry): CString {
+        let res, _ = this.entries.reduce<(|CString, List<CString>|)>((|'', entry.items|), fn(acc, fmt) => {
+            let fargs = acc.1.firstK(fmt.entries.size());
+            let rrest = acc.1.shiftK(fmt.entries.size());
+
+            let formatted = CString::concat(acc.0, '%n;', fmt.format(fargs));
+            return formatted, rrest;
+        });
+
+        return res;
+    }
+}
+
+datatype DatabaseOperation
+of
+NumRecordsOp { }
+| EndOp { }
+| ListOp { }
+| GotoRecordOp { field ridx: Nat; }
+| NextOp { }
+| PreviousOp { }
+| StatusOp { }
+| AddOp { field entry: Entry; }
+| ModifyOp { field entry: Entry; }
+| RemoveOp { }
+;
+
+entity DatabaseIndex {
+    field imap: List<Nat>;
+    field curr: Nat;
+
+    invariant $curr < $imap.size();
+}
+
+entity Database {
+    field dbname: Option<CString> = none;
+    field entries: List<Entry>;
+    field format: Format;
+
+    field index: Option<DatabaseIndex>;
+	field fnum: Option<Nat>;
+
+    function indexQuickCheck(idx: Option<DatabaseIndex>, entrycount: Nat): Bool {
+        if(idx)@none {
+            return true;
+        }
+        else {
+            return $idx.imap.size() == entrycount && $idx.curr < entrycount;
+        }
+    }
+
+    function indexFullCheck(idx: Option<DatabaseIndex>, entrycount: Nat): Bool {
+        if(idx)@none {
+            return true;
+        }
+        else {
+            if($idx.imap.size() != entrycount || $idx.curr >= entrycount) {
+                return false;
+            }
+            else {
+                return $idx.imap.allOf(pred(i) => i < entrycount);
+            }
+        }
+    }
+
+    invariant Database::indexQuickCheck($index, $entries.size());
+
+    validate $entries.allOf(pred(e) => e.items.size() == $format.vcount);
+    validate Database::indexFullCheck($index, $entries.size());
+
+    method setIndex(atidx: Nat): Database, DatabaseIndex {
+        let nidx = this.entries.mapIdx<Nat>(fn(e, i) => i);
+        let nindex = DatabaseIndex{nidx, atidx};
+
+        return Database{ this.dbname, this.entries, this.format, some(nindex), this.fnum }, nindex;
+    }
+
+    method ensureIndex(atidx: Option<Nat>): Database, DatabaseIndex {
+        if($tidx = this.index)@none {
+            if(atidx)@none {
+                return this.setIndex(0n);
+            }
+            else {
+                return this.setIndex($atidx);   
+            }
+            
+        }
+        else {
+            if(atidx)@none {
+                return this, $tidx;
+            }
+            else {
+                let dbidx = DatabaseIndex{$tidx.imap, $atidx};
+                return Database{ this.dbname, this.entries, this.format, some(dbidx), this.fnum }, dbidx;
+            }
+        }
+    }
+
+    method setCurr(atIdx: Nat): Database
+        requires this.index?some;
+    {
+        return Database{ this.dbname, this.entries, this.format, some(DatabaseIndex{this.index@some.imap, atIdx}), this.fnum };
+    }
+
+    method printRec(): CString, Database {
+        let tdb, tidx = this.ensureIndex(none); 
+
+        let entry = tdb.entries.get(tidx.imap.get(tidx.curr));
+        return tdb.format.formatEntry(entry), tdb;
+	}
+
+    method processNumRecords(op: NumRecordsOp): CString {
+        return CString::concat('Records Count: ', this.entries.size().toCString());
+    }
+
+    method processEnd(op: EndOp): CString, Database {
+        if(this.entries.empty()) {
+            return 'Empty DB', this;
+        }
+        else {
+            let tdb, _ = this.ensureIndex(some(this.entries.lastIndex()));
+            return tdb.printRec();
+        }
+    }
+
+    method processList(op: ListOp): CString, Database {
+        if(this.entries.empty()) {
+            return 'Empty DB', this;
+        }
+        else {
+            let tdb, _ = this.ensureIndex(some(0n));
+            return tdb.printRec();
+        }
+    }
+
+    method processGotoRecord(op: GotoRecordOp): CString, Database {
+        if(0n == op.ridx || this.entries.size() < op.ridx) {
+            return 'Invalid Record Index', this;
+        }
+        else {
+            let tdb, tidx = this.ensureIndex(some(op.ridx - 1n));
+            return tdb.printRec();
+        }
+    }
+
+    method processNext(op: NextOp): CString, Database {
+        let tdb, tidx = this.ensureIndex(none);
+
+        if(tidx.curr >= this.entries.lastIndex()) {
+            return '', tdb;
+        }
+        else {
+            let ntdb = tdb.setCurr(tidx.curr + 1n);
+            return ntdb.printRec();
+        }
+    }
+
+    method processPrevious(op: PreviousOp): CString, Database {
+        let tdb, tidx = this.ensureIndex(none);
+
+        if(tidx.curr == 0n) {
+            return '', tdb;
+        }
+        else {
+            let ntdb = tdb.setCurr(tidx.curr - 1n);
+            return ntdb.printRec();
+        }
+    }
+
+    method processStatus(op: StatusOp): CString {
+        let tdb, tidx = this.ensureIndex(none);
+
+        return CString::concat(tidx.curr.toCString(), ' of ', this.entries.size().toCString());
+    }
+
+    method processAdd(op: AddOp): Database 
+        requires op.entry.items.size() == this.format.vcount;
+    {
+        return Database{ this.dbname, this.entries.pushBack(op.entry), this.format, none, none };
+    }
+
+    method processModify(op: ModifyOp): Database {
+        if($idx = this.index)@none {
+            return this;
+        }
+        else {
+           return Database{ this.dbname, this.entries.set($idx.imap.get($idx.curr), op.entry), this.format, this.index, none };
+        }
+    }
+
+    method processRemove(op: RemoveOp): Database {
+        if(this.entries.empty()) {
+            return this;
+        }
+        else {
+            let tdb, tidx = this.ensureIndex(none);
+
+            return Database{ this.dbname, this.entries.delete(tidx.imap.get(tidx.curr)), this.format, none, none };
+        }
+    }
+
+    method processDatabaseOperation(op: DatabaseOperation): CString, Database {
+        match(op)@ {
+            NumRecordsOp => { return this.processNumRecords($op), this; }
+            | EndOp => { return this.processEnd($op); }
+            | ListOp => { return this.processList($op); }
+            | GotoRecordOp => { return this.processGotoRecord($op); }
+            | NextOp => { return this.processNext($op); }
+            | PreviousOp => { return this.processPrevious($op); }
+            | StatusOp => { return this.processStatus($op), this; }
+            | AddOp => { return '', this.processAdd($op); }
+            | ModifyOp => { return '', this.processModify($op); }
+            | RemoveOp => { return '', this.processRemove($op); }
+        }
+    }
+
+    method processDB(ops: List<DatabaseOperation>): CString, Database {
+        let res, tdb = ops.reduce<(|List<CString>, Database|)>((|List<CString>{}, this|), fn(acc, op) => {
+            let opstr, ndb = acc.1.processDatabaseOperation(op);
+            return acc.0.pushBack(opstr), ndb;
+        });
+
+        return CString::joinAll('%n;', res), tdb;
+    }
+}
+
+
+function getSampleDB(): Database {
+    let entries = List<Entry>{
+        Entry{List<CString>{'Bosque', 'Yes', 'Hybrid'}},
+        Entry{List<CString>{'C++', 'Yes', 'Compiled'}},
+        Entry{List<CString>{'JavaScript', 'No', 'JIT'}},
+        Entry{List<CString>{'Python', 'No', 'Interpreted'}},
+        Entry{List<CString>{'Java', 'Yes', 'JIT'}},
+        Entry{List<CString>{'C#', 'Yes', 'JIT'}}
+    }
+    .append(List<Entry>{
+        Entry{List<CString>{'TypeScript', 'Yes', 'Compiled'}},
+        Entry{List<CString>{'Go', 'Yes', 'Compiled'}},
+        Entry{List<CString>{'Rust', 'Yes', 'Compiled'}},
+        Entry{List<CString>{'Swift', 'Yes', 'Compiled'}},
+        Entry{List<CString>{'Kotlin', 'Yes', 'JIT'}},
+        Entry{List<CString>{'Ruby', 'No', 'Interpreted'}}
+    })
+    .append(List<Entry>{
+        Entry{List<CString>{'PHP', 'No', 'Interpreted'}},
+        Entry{List<CString>{'Scala', 'Yes', 'JIT'}},
+        Entry{List<CString>{'Haskell', 'Yes', 'Compiled'}},
+        Entry{List<CString>{'OCaml', 'Yes', 'Compiled'}},
+        Entry{List<CString>{'F#', 'Yes', 'JIT'}},
+        Entry{List<CString>{'Dart', 'Yes', 'JIT'}}
+    })
+    .append(List<Entry>{
+        Entry{List<CString>{'Elixir', 'Yes', 'BEAM'}},
+        Entry{List<CString>{'Erlang', 'Yes', 'BEAM'}},
+        Entry{List<CString>{'Clojure', 'Yes', 'JIT'}},
+        Entry{List<CString>{'Lua', 'No', 'Interpreted'}},
+        Entry{List<CString>{'Perl', 'No', 'Interpreted'}},
+        Entry{List<CString>{'R', 'No', 'Interpreted'}}
+    })
+    .append(List<Entry>{
+        Entry{List<CString>{'MATLAB', 'Yes', 'Interpreted'}},
+        Entry{List<CString>{'Julia', 'Yes', 'JIT'}},
+        Entry{List<CString>{'Fortran', 'Yes', 'Compiled'}},
+        Entry{List<CString>{'COBOL', 'Yes', 'Compiled'}},
+        Entry{List<CString>{'Pascal', 'Yes', 'Compiled'}},
+        Entry{List<CString>{'Ada', 'Yes', 'Compiled'}}
+    })
+    .append(List<Entry>{
+        Entry{List<CString>{'Lisp', 'Yes', 'Interpreted'}},
+        Entry{List<CString>{'Scheme', 'Yes', 'Interpreted'}},
+        Entry{List<CString>{'Prolog', 'Yes', 'Interpreted'}},
+        Entry{List<CString>{'SQL', 'No', 'Interpreted'}},
+        Entry{List<CString>{'Bash', 'No', 'Interpreted'}},
+        Entry{List<CString>{'PowerShell', 'No', 'Interpreted'}}
+    })
+    .append(List<Entry>{
+        Entry{List<CString>{'Assembly', 'No', 'Compiled'}},
+        Entry{List<CString>{'VHDL', 'Yes', 'Compiled'}},
+        Entry{List<CString>{'Verilog', 'Yes', 'Compiled'}},
+        Entry{List<CString>{'HTML', 'No', 'Interpreted'}},
+        Entry{List<CString>{'CSS', 'No', 'Interpreted'}},
+        Entry{List<CString>{'XML', 'No', 'Interpreted'}}
+    })
+    .append(List<Entry>{
+        Entry{List<CString>{'JSON', 'No', 'Interpreted'}},
+        Entry{List<CString>{'YAML', 'No', 'Interpreted'}},
+        Entry{List<CString>{'Markdown', 'No', 'Interpreted'}},
+        Entry{List<CString>{'TOML', 'No', 'Interpreted'}},
+        Entry{List<CString>{'INI', 'No', 'Interpreted'}},
+        Entry{List<CString>{'CSV', 'No', 'Interpreted'}}
+    })
+    .append(List<Entry>{
+        Entry{List<CString>{'GraphQL', 'No', 'Interpreted'}}
+    });
+
+    let format = Format{
+        List<FormatEntry>{
+            FormatEntry{'PL', List<CString>{'Name'}},
+            FormatEntry{'Features', List<CString>{'Static Types', 'Runtime'}}
+        },
+        3n
+    };
+
+    return Database{none, entries, format, none, none};
+}
+
+function testOpOnSample(op: DatabaseOperation): CString {
+    let db = getSampleDB();
+    let res, _ = db.processDatabaseOperation(op);
+    
+    return res;
+}
+
+function db_run(): Nat {
+    var tmp = testOpOnSample(NumRecordsOp { });
+
+    %% START WHILE LOOP
+
+    tmp = testOpOnSample(NumRecordsOp { });
+    tmp = testOpOnSample(EndOp { });
+    tmp = testOpOnSample(ListOp{});
+    tmp = testOpOnSample(GotoRecordOp{2n});
+    tmp = testOpOnSample(NextOp{});
+    tmp = testOpOnSample(PreviousOp{});
+    tmp = testOpOnSample(StatusOp{});
+    tmp = testOpOnSample(AddOp{Entry{List<CString>{'Bosque', 'Yes', 'Hybrid'}}  });
+    tmp = testOpOnSample(ModifyOp{Entry{List<CString>{'Bosque', 'Yes', 'Hybrid'}} });
+    tmp = testOpOnSample(RemoveOp{});
+
+    %% END WHILE LOOP
+
+    return 1n;
+}
+
+const checkerBoard: Surface = Surface{Color{0.02f, 0.0f, 0.1f}, Color{1.0f, 1.0f, 1.0f}, 0.5f, 150.0f};
+
+const shiny: Surface = Surface{Color{1.0f, 1.0f, 1.0f}, Color{0.5f, 0.5f, 0.5f}, 0.7f, 250.0f};
+
+const matteShiny: Surface = Surface{Color{1.0f, 1.0f, 1.0f}, Color{0.25f, 0.25f, 0.25f}, 0.7f, 250.0f};
+
+entity RayTracer{
+    const maxDepth: Int = 5i;
+
+    function createDefaultScene(): Scene {
+        let things = List<SceneObject>{
+            Sphere{Main::matteShiny, Vector{-0.5f, 1.0f, 1.5f}, 0.5f},
+            Sphere{Main::shiny, Vector{0.0f, 1.0f, -0.25f}, 1.0f},
+            Plane{Main::checkerBoard, Vector{0.0f, 1.0f, 0.0f}, 0.0f}
+        };
+
+        let lights = List<Light>{
+            Light{Vector{-2.0f, 2.5f, 0.0f}, Color{0.5f, 0.45f, 0.41f}},
+            Light{Vector{2.0f, 4.5f, 2.0f}, Color{0.99f, 0.95f, 0.8f}}
+        };
+
+        let camera = Camera::create(Vector{2.75f, 2.0f, 3.75f}, Vector{-0.6f, 0.5f, 0.0f});
+
+        return Scene{things, lights, camera};
+    }
+
+    function createParameterScene(things: List<SceneObject>): Scene {
+        let lights = List<Light>{
+            Light{Vector{-2.0f, 2.5f, 0.0f}, Color{0.5f, 0.45f, 0.41f}},
+            Light{Vector{2.0f, 4.5f, 2.0f}, Color{0.99f, 0.95f, 0.8f}}
+        };
+
+        let camera = Camera::create(Vector{2.75f, 2.0f, 3.75f}, Vector{-0.6f, 0.5f, 0.0f});
+
+        return Scene{things, lights, camera};
+    }
+
+    method minIntersection(ray: Ray, scene: Scene): Option<ISect> {
+        return scene.things.reduce<Option<ISect>>(none, fn(min, obj) => {
+            let isect = obj.intersect(ray);
+            if(isect)@none {
+                return min;
+            }
+            else {
+                if(min)@none {
+                    return isect;
+                }
+                else {
+                    if($min.dist > $isect.dist) {
+                        return isect;
+                    }
+                    else {
+                        return min;
+                    }
+                }
+            }
+        });
+    }
+
+    method testRay(ray: Ray, scene: Scene): Float {
+        let isect = this.minIntersection(ray, scene);
+        if(isect)@none {
+            return 0.0f;
+        }
+        else {
+            return $isect.dist;
+        }
+    }
+
+    method traceRay(ray: Ray, scene: Scene, depth: Int): Color {
+        let isect = this.minIntersection(ray, scene);
+        if(isect)@none {
+            return Color::background;
+        }
+        else {
+            return this.shade($isect, scene, depth);
+        }
+    }
+
+    method getNaturalColor(thing: SceneObject, pos: Vector, norm: Vector, rd: Vector, scene: Scene): Color {
+        return scene.lights.reduce[recursive]<Color>(Color{0.0f, 0.0f, 0.0f}, recursive fn(ret, light) => {
+            let ldis = Vector::minus(light.pos, pos);
+            let livec = Vector::norm(ldis);
+            let neatIsect = this.testRay(Ray{pos, livec}, scene);
+            let isInShadow = !((neatIsect > Vector::mag(ldis)) || (neatIsect == 0.0f));
+            if(isInShadow) {
+                return ret;
+            }
+            else {
+                let illum = Vector::dot(livec, norm);
+                let lcolor = if(illum > 0.0f) then Color::times(illum, light.color) else Color{0.0f, 0.0f, 0.0f};
+                let specular = Vector::dot(livec, Vector::norm(rd));
+                let scolor = if(specular > 0.0f) then Color::times(Float::pow(specular, thing.surface.roughness), light.color) else Color{0.0f, 0.0f, 0.0f};
+                return Color::plus(ret, Color::plus(Color::ctimes(thing.surface.diffuse, lcolor), Color::ctimes(thing.surface.specular, scolor)));
+            }
+        });
+    }
+
+    method getReflectionColor(thing: SceneObject, pos: Vector, norm: Vector, rd: Vector, scene: Scene, depth: Int): Color {
+        return Color::times(thing.surface.reflect, this.traceRay(Ray{pos, rd}, scene, depth + 1i));
+    }
+
+    method shade(isect: ISect, scene: Scene, depth: Int): Color {
+        let d = isect.ray.dir;
+        let pos = Vector::plus(Vector::times(isect.dist, isect.ray.dir), isect.ray.start);
+        let normal = isect.thing.normal(pos);
+        let reflectDir = Vector::minus(d, Vector::times(2.0f * Vector::dot(normal, d), normal));
+        let ret = Color::plus(Color::defaultColor, this.getNaturalColor(isect.thing, pos, normal, reflectDir, scene));
+
+        if(depth >= RayTracer::maxDepth){
+            return Color::plus(ret, Color{0.5f, 0.5f, 0.5f});
+        }
+
+        return Color::plus(ret, this.getReflectionColor(isect.thing, Vector::plus(pos, Vector::times(0.001f, reflectDir)), normal, reflectDir, scene, depth));
+    }
+}
+
+entity Vector {
+    field x: Float;
+    field y: Float;
+    field z: Float;
+    
+    function times(n: Float, v: Vector): Vector {
+        return Vector{v.x * n, v.y * n, v.z * n};
+    }
+    
+    function minus(v1: Vector, v2: Vector): Vector {
+        return Vector{v1.x - v2.x, v1.y - v2.y, v1.z - v2.z};
+    }
+    
+    function plus(v1: Vector, v2: Vector): Vector {
+        return Vector{v1.x + v2.x, v1.y + v2.y, v1.z + v2.z};
+    }
+    
+    function dot(v1: Vector, v2: Vector): Float {
+        return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z);
+    }
+    
+    function mag(v: Vector): Float { 
+        return Float::sqrt(Vector::dot(v, v)); 
+    }
+    
+    function norm(v: Vector): Vector {
+        let mag = Vector::mag(v);
+        let div = if(mag == 0.0f) then 1000000000.0f else (1.0f // mag);
+        return Vector::times(div, v);
+    }
+
+    function cross(v1: Vector, v2: Vector): Vector {
+        return Vector{ ((v1.y * v2.z) - (v1.z * v2.y)), ((v1.z * v2.x) - (v1.x * v2.z)), ((v1.x * v2.y) - (v1.y * v2.x)) };
+    }
+
+    function equals(v1: Vector, v2: Vector): Bool {
+        return (v1.x == v2.x) && (v1.y == v2.y) && (v1.z == v2.z);
+    }
+}
+
+entity Color {
+    field r: Float;
+    field g: Float;
+    field b: Float;
+
+    function times(n: Float, v: Color): Color {
+        return Color{n * v.r, n * v.g, n * v.b};
+    }
+
+    function ctimes(v1: Color, v2: Color): Color {
+        return Color{v1.r * v2.r, v1.g * v2.g, v1.b * v2.b};
+    }
+
+    function plus(v1: Color, v2: Color): Color {
+        return Color{v1.r + v2.r, v1.g + v2.g, v1.b + v2.b};
+    }
+
+    function minus(v1: Color, v2: Color): Color {
+        return Color{v1.r - v2.r, v1.g - v2.g, v1.b - v2.b};
+    }
+
+    const background: Color = Color{0.0f, 0.0f, 0.0f};
+    const defaultColor: Color = Color{0.0f, 0.0f, 0.0f};
+
+    function legalize(d: Float): Float {
+        return if(d > 1.0f) then 1.0f else d;
+    }
+}
+
+entity Ray {
+    field start: Vector;
+    field dir: Vector;
+}
+
+entity ISect {
+    field thing: SceneObject;
+    field ray: Ray;
+    field dist: Float;
+}
+
+entity Surface {
+    field diffuse: Color;
+    field specular: Color;
+    field reflect: Float;
+    field roughness: Float;
+}
+
+entity Camera {
+    field pos: Vector;
+    field forward: Vector;
+    field up: Vector;
+    field right: Vector;
+
+    function create(pos: Vector, lookAt: Vector): Camera {
+        let forward = Vector::norm(Vector::minus(lookAt, pos));
+        let down = Vector{0.0f, -1.0f, 0.0f};
+        let right = Vector::times(1.5f, Vector::norm(Vector::cross(forward, down)));
+        let up = Vector::times(1.5f, Vector::norm(Vector::cross(forward, right)));
+
+        return Camera{pos, forward, up, right};
+    }
+}
+
+entity Light {
+    field pos: Vector;
+    field color: Color;
+}
+
+concept SceneObject {
+    field surface: Surface;
+    
+    method intersect(ray: Ray): Option<ISect> {
+        if(this)@<Sphere> {
+            return $this.intersectSphere(ray);
+        }
+        else {
+            return this@<Plane>.intersectPlane(ray);
+        }
+    }
+
+    method normal(pos: Vector): Vector {
+        if(this)@<Sphere> {
+            return Vector::norm(Vector::minus(pos, $this.center));
+        }
+        else {
+            return this@<Plane>.norm;
+        }
+    }
+}
+
+entity Sphere provides SceneObject {
+    field center: Vector;
+    field radius: Float;
+
+    method intersectSphere(ray: Ray): Option<ISect> {
+        let eo = Vector::minus(this.center, ray.start);
+        let v = Vector::dot(eo, ray.dir);
+
+        var dist: Float;
+        if(v < 0.0f)
+        {
+            dist = 0.0f;
+        }
+        else
+        {
+            let disc = Float::square(this.radius) - (Vector::dot(eo, eo) - Float::square(v));
+            dist = if(disc < 0.0f) then 0.0f else (v - Float::sqrt(disc));
+        }
+
+        if(dist == 0.0f) {
+            return none;
+        }
+        else {
+            return some(ISect{this, ray, dist});
+        }
+    }
+}
+
+entity Plane provides SceneObject {
+    field norm: Vector;
+    field offset: Float;
+
+    method intersectPlane(ray: Ray): Option<ISect> {
+        let denom = Vector::dot(this.norm, ray.dir);
+
+        if(denom > 0.0f) {
+            return none;
+        }
+        else {
+            return some(ISect{this, ray, (Vector::dot(this.norm, ray.start) + this.offset) // (-1.0f * denom)});
+        }
+    }
+}
+
+entity Scene {
+    field things: List<SceneObject>;
+    field lights: List<Light>;
+    field camera: Camera;
+}
+
+function render_fixed(): Color {
+    let sc = RayTracer::createDefaultScene();
+
+    return RayTracer{}.traceRay(Ray{sc.camera.pos, Vector::norm(Vector::minus(sc.camera.forward, sc.camera.pos))}, sc, 0i);
+}
+
+function render_param(thing: SceneObject): Color {
+    let sc = RayTracer::createParameterScene(List<SceneObject>{thing});
+
+    return RayTracer{}.traceRay(Ray{sc.camera.pos, Vector::norm(Vector::minus(sc.camera.forward, sc.camera.pos))}, sc, 0i);
+}
+
+function raytrace_run(): Nat {
+    var tmp: Color = render_fixed();
+    tmp = render_param(Sphere{ shiny, Vector{ 0.5f, 1.0f, 1.5f }, 1.0f });
+
+    return 1n;
+}
+
+public function main(): Nat {
+    let nbody = nbody_run();
+    let db = db_run();
+    let raytrace = raytrace_run();
+
+    return nbody + db + raytrace;
+}
