@@ -10,6 +10,8 @@ declare namespace Main;
 %%This is a bosque nbody implementation of https://benchmarksgame-team.pages.debian.net/benchmarksgame/performance/nbody.html.
 %%
 
+const step: Float = 0.01f;
+
 entity Position {
     field x: Float;
     field y: Float;
@@ -232,7 +234,6 @@ entity NBodySystem {
 
 function nbody_run(): Nat {
     var system = NBodySystem::create();
-    let step = 0.01f;
 
     system = system.advance(step);
 
@@ -821,6 +822,16 @@ entity Camera {
 
         return Camera{pos, forward, up, right};
     }
+
+    method getPoint(x: Float, y: Float, screenWidth: Float, screenHeight: Float): Vector {
+        let recenterX = (x - (screenWidth // 2.0f)) // 2.0f // screenWidth;
+        let recenterY = -(y - (screenHeight // 2.0f)) // 2.0f // screenHeight;
+        return Vector::norm(
+            Vector::plus(this.forward, Vector::plus(
+            Vector::times(recenterX, this.right), 
+            Vector::times(recenterY, this.up)
+        )));
+    }
 }
 
 entity Light {
@@ -912,9 +923,17 @@ function render_param(thing: SceneObject): Color {
     return RayTracer{}.traceRay(Ray{sc.camera.pos, Vector::norm(Vector::minus(sc.camera.forward, sc.camera.pos))}, sc, 0i);
 }
 
+function render_pixel(x: Float, y: Float, width: Float, height: Float): Color {
+    let sc = RayTracer::createDefaultScene();
+    let rayDir = sc.camera.getPoint(x, y, width, height);
+    
+    return RayTracer{}.traceRay(Ray{sc.camera.pos, rayDir}, sc, 0i);
+}
+
 function raytrace_run(): Nat {
     var tmp: Color = render_fixed();
     tmp = render_param(Sphere{ shiny, Vector{ 0.5f, 1.0f, 1.5f }, 1.0f });
+    tmp = render_pixel(0.0f, 0.0f, 1920.0f, 1080.0f);
 
     return 1n;
 }

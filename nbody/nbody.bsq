@@ -145,10 +145,12 @@ entity NBodySystem {
             Body::neptune
         };
 
+%*
         let j = planets.get(0n);
         let s = planets.get(1n);
         let u = planets.get(2n);
         let n = planets.get(3n);
+*%
 
         let px = planets.map<Float>(fn(p: Body): Float => p.vel.vx * p.mass).sum();
         let py = planets.map<Float>(fn(p: Body): Float => p.vel.vy * p.mass).sum();
