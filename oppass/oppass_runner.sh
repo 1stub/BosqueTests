@@ -7,6 +7,8 @@ bsqir=$bosque/src/bsqir
 cbsqir=$cwd/bsqir
 cpp=$bosque/bin/src/cmd/analyzecpp.js
 
+mini=$cwd/mini_ir.bsq
+
 cppout=$cwd/cppout
 src=$1
 
@@ -30,6 +32,7 @@ function cleanup() {
 cleanup
 
 cp -R $bsqir $cwd
+cp $mini $cbsqir
 
 echo "Loading .bsq files from bsqir directory:"
 bsqir_files=()

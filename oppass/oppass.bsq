@@ -4,7 +4,7 @@ declare namespace Main {
 
 public function main(): Bool
 {
-    let explicit = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::nbodyir);
+    let explicit = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::mini_ir);
     let simple = BSQAssembly::ConstantSimplification::process(explicit);
 
     return true;

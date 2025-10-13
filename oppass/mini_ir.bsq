@@ -1,0 +1,61 @@
+namespace BSQAssembly;
+
+%%
+%% This is a sample IR that will work without support for parsing bsqir
+%% files or arguments to main. It is has been manually setup to properly
+%% allow for list and map construction given constructor constraints
+%%
+
+const mini_ir: BSQAssembly::Assembly = BSQAssembly::Assembly{
+    List<BSQAssembly::NamespaceConstDecl>{ },
+    List<BSQAssembly::ConstMemberDecl>{
+        BSQAssembly::ConstMemberDecl{ file="/home/stub/repos/BosqueCore/bin/core/core.bsq", sinfo=BSQAssembly::SourceInfo{ line=48n, column=4n, pos=1154n, span=5n }, fullns = List<CString>{'Core'}, declaredInNS='Core'<BSQAssembly::NamespaceKey>, attributes=List<BSQAssembly::DeclarationAttibute>{  },  name='zero'<BSQAssembly::Identifier>, declaredInType=BSQAssembly::NominalTypeSignature{ sinfo=BSQAssembly::SourceInfo{ line=45n, column=52n, pos=1113n, span=6n }, tkeystr='Int'<TypeKey> }, declaredType=BSQAssembly::NominalTypeSignature{ sinfo=BSQAssembly::SourceInfo{ line=48n, column=16n, pos=1166n, span=3n }, tkeystr='Int'<TypeKey> }, value=BSQAssembly::LiteralSimpleExpression{ sinfo=BSQAssembly::SourceInfo{ line=48n, column=22n, pos=1172n, span=2n }, etype=BSQAssembly::NominalTypeSignature{ sinfo=BSQAssembly::SourceInfo{ line=45n, column=52n, pos=1113n, span=6n }, tkeystr='Int'<TypeKey> }, value='0i' } },
+        BSQAssembly::ConstMemberDecl{ file="/home/stub/repos/BosqueCore/bin/core/core.bsq", sinfo=BSQAssembly::SourceInfo{ line=49n, column=4n, pos=1180n, span=5n }, fullns = List<CString>{'Core'}, declaredInNS='Core'<BSQAssembly::NamespaceKey>, attributes=List<BSQAssembly::DeclarationAttibute>{  },  name='one'<BSQAssembly::Identifier>, declaredInType=BSQAssembly::NominalTypeSignature{ sinfo=BSQAssembly::SourceInfo{ line=45n, column=52n, pos=1113n, span=6n }, tkeystr='Int'<TypeKey> }, declaredType=BSQAssembly::NominalTypeSignature{ sinfo=BSQAssembly::SourceInfo{ line=49n, column=15n, pos=1191n, span=3n }, tkeystr='Int'<TypeKey> }, value=BSQAssembly::LiteralSimpleExpression{ sinfo=BSQAssembly::SourceInfo{ line=49n, column=21n, pos=1197n, span=2n }, etype=BSQAssembly::NominalTypeSignature{ sinfo=BSQAssembly::SourceInfo{ line=45n, column=52n, pos=1113n, span=6n }, tkeystr='Int'<TypeKey> }, value='1i' } }
+    },
+    Map<BSQAssembly::InvokeKey, BSQAssembly::NamespaceFunctionDecl>{
+        'Main::main'<BSQAssembly::InvokeKey> => BSQAssembly::NamespaceFunctionDecl{ file="/home/stub/repos/bosque_notes/cpp_emit_testing/tmp.bsq", sinfo=BSQAssembly::SourceInfo{ line=17n, column=7n, pos=206n, span=8n }, fullns = List<CString>{'Main'}, declaredInNS='Main'<BSQAssembly::NamespaceKey>, attributes=List<BSQAssembly::DeclarationAttibute>{ BSQAssembly::DeclarationAttibute{name='public'<BSQAssembly::Identifier>, tags=List<(|BSQAssembly::TypeSignature, CString|)>{  }, text=none } },
+            name='main'<BSQAssembly::Identifier>,
+            ikey='Main::main'<BSQAssembly::InvokeKey>, irecursive=BSQAssembly::RecursiveAnnotation#NonRecursiveTag,
+            params=List<BSQAssembly::InvokeParameterDecl>{  },
+            resultType=BSQAssembly::NominalTypeSignature{ sinfo=BSQAssembly::SourceInfo{ line=17n, column=24n, pos=223n, span=3n }, tkeystr='Int'<TypeKey> },
+            body=BSQAssembly::StandardBodyImplementation {
+            List<BSQAssembly::Statement>{
+                BSQAssembly::ReturnSingleStatement{ sinfo=BSQAssembly::SourceInfo{ line=18n, column=4n, pos=233n, span=6n }, rtype=BSQAssembly::NominalTypeSignature{ sinfo=BSQAssembly::SourceInfo{ line=17n, column=24n, pos=223n, span=3n }, tkeystr='Int'<TypeKey> }, value=BSQAssembly::LiteralSimpleExpression{ sinfo=BSQAssembly::SourceInfo{ line=18n, column=11n, pos=240n, span=2n }, etype=BSQAssembly::NominalTypeSignature{ sinfo=BSQAssembly::SourceInfo{ line=45n, column=52n, pos=1113n, span=6n }, tkeystr='Int'<TypeKey> }, value='1i' } }
+            }},
+            preconditions=List<BSQAssembly::PreConditionDecl>{  }, postconditions=List<BSQAssembly::PostConditionDecl>{  }, 
+            fkind=BSQAssembly::FunctionDeclKindTag#Function
+        }
+    },
+    Map<BSQAssembly::InvokeKey, BSQAssembly::TypeFunctionDecl>{ },
+    Map<BSQAssembly::InvokeKey, BSQAssembly::MethodDeclAbstract>{ },
+    Map<BSQAssembly::InvokeKey, BSQAssembly::MethodDeclVirtual>{ },
+    Map<BSQAssembly::InvokeKey, BSQAssembly::MethodDeclOverride>{ },
+    Map<BSQAssembly::InvokeKey, BSQAssembly::MethodDeclStatic>{ },
+    Map<BSQAssembly::TypeKey, BSQAssembly::EnumTypeDecl>{ },
+    Map<BSQAssembly::TypeKey, BSQAssembly::TypedeclTypeDecl>{ },
+    Map<BSQAssembly::TypeKey, BSQAssembly::TypedeclStringOfTypeDecl>{ },
+    Map<BSQAssembly::TypeKey, BSQAssembly::PrimitiveEntityTypeDecl>{
+        'None'<BSQAssembly::TypeKey> => BSQAssembly::PrimitiveEntityTypeDecl{ file="/home/stub/repos/BosqueCore/bin/core/core.bsq", sinfo=BSQAssembly::SourceInfo{ line=15n, column=11n, pos=415n, span=6n }, fullns = List<CString>{'Core'}, declaredInNS='Core'<BSQAssembly::NamespaceKey>, tkey='None'<BSQAssembly::TypeKey>, name='None', invariants=List<BSQAssembly::InvariantDecl>{  }, validates=List<BSQAssembly::ValidateDecl>{  }, absmethods=List<BSQAssembly::InvokeKey>{  }, virtmethods=List<BSQAssembly::InvokeKey>{  }, overmethods=List<BSQAssembly::InvokeKey>{  }, staticmethods=List<BSQAssembly::InvokeKey>{  }, saturatedProvides=List<BSQAssembly::NominalTypeSignature>{  }, saturatedBFieldInfo=List<BSQAssembly::SaturatedFieldInfo>{  }, allInvariants=List<BSQAssembly::SaturatedInvariantInfo>{  }, allValidates=List<BSQAssembly::SaturatedInvariantInfo>{  } },
+        'Bool'<BSQAssembly::TypeKey> => BSQAssembly::PrimitiveEntityTypeDecl{ file="/home/stub/repos/BosqueCore/bin/core/core.bsq", sinfo=BSQAssembly::SourceInfo{ line=23n, column=42n, pos=610n, span=6n }, fullns = List<CString>{'Core'}, declaredInNS='Core'<BSQAssembly::NamespaceKey>, tkey='Bool'<BSQAssembly::TypeKey>, name='Bool', invariants=List<BSQAssembly::InvariantDecl>{  }, validates=List<BSQAssembly::ValidateDecl>{  }, absmethods=List<BSQAssembly::InvokeKey>{  }, virtmethods=List<BSQAssembly::InvokeKey>{  }, overmethods=List<BSQAssembly::InvokeKey>{  }, staticmethods=List<BSQAssembly::InvokeKey>{  }, saturatedProvides=List<BSQAssembly::NominalTypeSignature>{  }, saturatedBFieldInfo=List<BSQAssembly::SaturatedFieldInfo>{  }, allInvariants=List<BSQAssembly::SaturatedInvariantInfo>{  }, allValidates=List<BSQAssembly::SaturatedInvariantInfo>{  } }
+        }.insert('Int'<BSQAssembly::TypeKey>, BSQAssembly::PrimitiveEntityTypeDecl{ file="/home/stub/repos/BosqueCore/bin/core/core.bsq", sinfo=BSQAssembly::SourceInfo{ line=45n, column=52n, pos=1113n, span=6n }, fullns = List<CString>{'Core'}, declaredInNS='Core'<BSQAssembly::NamespaceKey>, tkey='Int'<BSQAssembly::TypeKey>, name='Int', invariants=List<BSQAssembly::InvariantDecl>{  }, validates=List<BSQAssembly::ValidateDecl>{  }, absmethods=List<BSQAssembly::InvokeKey>{  }, virtmethods=List<BSQAssembly::InvokeKey>{  }, overmethods=List<BSQAssembly::InvokeKey>{  }, staticmethods=List<BSQAssembly::InvokeKey>{  }, saturatedProvides=List<BSQAssembly::NominalTypeSignature>{  }, saturatedBFieldInfo=List<BSQAssembly::SaturatedFieldInfo>{  }, allInvariants=List<BSQAssembly::SaturatedInvariantInfo>{  }, allValidates=List<BSQAssembly::SaturatedInvariantInfo>{  }}
+    ),
+    Map<BSQAssembly::TypeKey, BSQAssembly::ConstructableTypeDecl>{ },
+    Map<BSQAssembly::TypeKey, BSQAssembly::CollectionTypeDecl>{ },
+    Map<BSQAssembly::TypeKey, BSQAssembly::EntityTypeDecl>{ },
+    Map<BSQAssembly::TypeKey, BSQAssembly::DatatypeMemberEntityTypeDecl>{ },
+    Map<BSQAssembly::TypeKey, BSQAssembly::PrimitiveConceptTypeDecl>{ },
+    Map<BSQAssembly::TypeKey, BSQAssembly::ConceptTypeDecl>{ },
+    Map<BSQAssembly::TypeKey, BSQAssembly::DatatypeTypeDecl>{ },
+    List<BSQAssembly::InvokeKey>{
+        'Main::main'<BSQAssembly::InvokeKey>
+    },
+    List<BSQAssembly::InvokeKey>{ },
+    List<BSQAssembly::InvokeKey>{ },
+    List<BSQAssembly::TypeKey>{
+        'None'<BSQAssembly::TypeKey>,
+        'Bool'<BSQAssembly::TypeKey>,
+        'Int'<BSQAssembly::TypeKey>
+    },
+    List<BSQAssembly::TypeKey>{ },
+    BSQAssembly::TypeTopology{ ctopo=List<BSQAssembly::TypeKey>{ 'Bool'<BSQAssembly::TypeKey>, 'Int'<BSQAssembly::TypeKey>, 'None'<BSQAssembly::TypeKey> }, sccs=List<List<BSQAssembly::TypeKey>>{  } }
+};
