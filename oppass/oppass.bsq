@@ -1,0 +1,11 @@
+declare namespace Main {
+    using BSQAssembly;
+}
+
+public function main(): Bool
+{
+    let explicit = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::nbodyir);
+    let simple = BSQAssembly::ConstantSimplification::process(explicit);
+
+    return true;
+}

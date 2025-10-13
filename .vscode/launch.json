@@ -4,7 +4,7 @@
             "name": "(UDB)  Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/nbody/cppout/output/memex",
+            "program": "${workspaceFolder}/server/cppout/output/memex",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",

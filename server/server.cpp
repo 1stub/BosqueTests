@@ -27,7 +27,7 @@
     //
     // Now these can change!
     //
-    constexpr size_t DEFAULT_WORKLIST_SIZE = 600UL;
+    constexpr size_t DEFAULT_WORKLIST_SIZE = 1'200ULL;
 
     constexpr size_t NBODY_WORKLIST_SIZE = DEFAULT_WORKLIST_SIZE;
     constexpr size_t MIN_NBODY_STEPS = 37'500UL;
@@ -398,8 +398,10 @@
     }
     
     __CoreCpp::Nat main() noexcept  {
-        std::random_device rd{};
-        std::mt19937 gen{rd()};
+        //std::random_device rd{};
+        //std::mt19937 gen{rd()};
+        std::mt19937 gen{BENCHMARK_RANDOM_SEED}; 
+       
         std::string mode = "REPLACEME";
 
         /*
