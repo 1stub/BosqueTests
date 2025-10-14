@@ -398,9 +398,9 @@
     }
     
     __CoreCpp::Nat main() noexcept  {
-        //std::random_device rd{};
-        //std::mt19937 gen{rd()};
-        std::mt19937 gen{BENCHMARK_RANDOM_SEED}; 
+        std::random_device rd{};
+        std::mt19937 gen{rd()};
+        //std::mt19937 gen{BENCHMARK_RANDOM_SEED}; 
        
         std::string mode = "REPLACEME";
 

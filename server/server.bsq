@@ -270,13 +270,13 @@ entity Format {
     invariant $vcount == $entries.map<Nat>(fn(ee) => ee.entries.size()).sum();
 
     method formatEntry(entry: Entry): CString {
-        let res, _ = this.entries.reduce<(|CString, List<CString>|)>((|'', entry.items|), fn(acc, fmt) => {
+        let res, _ = this.entries.reduce<(|CString, List<CString>|)>(fn(acc, fmt) => {
             let fargs = acc.1.firstK(fmt.entries.size());
             let rrest = acc.1.shiftK(fmt.entries.size());
 
             let formatted = CString::concat(acc.0, '%n;', fmt.format(fargs));
             return formatted, rrest;
-        });
+        }, (|'', entry.items|));
 
         return res;
     }
@@ -284,7 +284,7 @@ entity Format {
 
 datatype DatabaseOperation
 of
-NumRecordsOp { }
+| NumRecordsOp { }
 | EndOp { }
 | ListOp { }
 | GotoRecordOp { field ridx: Nat; }
@@ -472,7 +472,7 @@ entity Database {
 
     method processDatabaseOperation(op: DatabaseOperation): CString, Database {
         match(op)@ {
-            NumRecordsOp => { return this.processNumRecords($op), this; }
+            | NumRecordsOp => { return this.processNumRecords($op), this; }
             | EndOp => { return this.processEnd($op); }
             | ListOp => { return this.processList($op); }
             | GotoRecordOp => { return this.processGotoRecord($op); }
@@ -486,10 +486,10 @@ entity Database {
     }
 
     method processDB(ops: List<DatabaseOperation>): CString, Database {
-        let res, tdb = ops.reduce<(|List<CString>, Database|)>((|List<CString>{}, this|), fn(acc, op) => {
+        let res, tdb = ops.reduce<(|List<CString>, Database|)>(fn(acc, op) => {
             let opstr, ndb = acc.1.processDatabaseOperation(op);
             return acc.0.pushBack(opstr), ndb;
-        });
+        }, (|List<CString>{}, this|));
 
         return CString::joinAll('%n;', res), tdb;
     }
@@ -642,7 +642,7 @@ entity RayTracer{
     }
 
     method minIntersection(ray: Ray, scene: Scene): Option<ISect> {
-        return scene.things.reduce<Option<ISect>>(none, fn(min, obj) => {
+        return scene.things.reduce<Option<ISect>>(fn(min, obj) => {
             let isect = obj.intersect(ray);
             if(isect)@none {
                 return min;
@@ -660,7 +660,7 @@ entity RayTracer{
                     }
                 }
             }
-        });
+        }, none);
     }
 
     method testRay(ray: Ray, scene: Scene): Float {
@@ -684,7 +684,7 @@ entity RayTracer{
     }
 
     method getNaturalColor(thing: SceneObject, pos: Vector, norm: Vector, rd: Vector, scene: Scene): Color {
-        return scene.lights.reduce[recursive]<Color>(Color{0.0f, 0.0f, 0.0f}, recursive fn(ret, light) => {
+        return scene.lights.reduce[recursive]<Color>(recursive fn(ret, light) => {
             let ldis = Vector::minus(light.pos, pos);
             let livec = Vector::norm(ldis);
             let neatIsect = this.testRay(Ray{pos, livec}, scene);
@@ -699,7 +699,7 @@ entity RayTracer{
                 let scolor = if(specular > 0.0f) then Color::times(Float::pow(specular, thing.surface.roughness), light.color) else Color{0.0f, 0.0f, 0.0f};
                 return Color::plus(ret, Color::plus(Color::ctimes(thing.surface.diffuse, lcolor), Color::ctimes(thing.surface.specular, scolor)));
             }
-        });
+        }, Color{0.0f, 0.0f, 0.0f});
     }
 
     method getReflectionColor(thing: SceneObject, pos: Vector, norm: Vector, rd: Vector, scene: Scene, depth: Int): Color {
