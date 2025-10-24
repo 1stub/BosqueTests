@@ -1,10 +1,3 @@
 declare namespace Main;
 
-type TypeKey = CString of /[A-Z][_a-zA-Z0-9]+/c;
-
-public function main(): Bool {
-    let t = 'Abc'<TypeKey>;
-    let q = 'Abc'<TypeKey>;
-
-    return KeyComparator::less<TypeKey>(t, q);
-}
+public function main(): Nat { return Map<Int, CString>::union(Map<Int, CString>{1i => 'a'}, Map<Int, CString>{3i => 'c', 2i => 'b'}).size(); }

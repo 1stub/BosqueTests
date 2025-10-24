@@ -27,7 +27,7 @@
     //
     // Now these can change!
     //
-    constexpr size_t DEFAULT_WORKLIST_SIZE = 1'200ULL;
+    constexpr size_t DEFAULT_WORKLIST_SIZE = 10ULL;
 
     constexpr size_t NBODY_WORKLIST_SIZE = DEFAULT_WORKLIST_SIZE;
     constexpr size_t MIN_NBODY_STEPS = 37'500UL;
@@ -91,16 +91,16 @@
        
         for(size_t& op : ops) {
             switch(op) {
-                case 1:  tmp = testOpOnSample(DatabaseOperation{ &NumRecordsOpType }); break;
-                case 2:  //tmp = testOpOnSample(DatabaseOperation{ &EndOpType }); break;
-                case 3:  //tmp = testOpOnSample(DatabaseOperation{ &ListOpType }); break;
-                case 4:  //tmp = testOpOnSample(DatabaseOperation{ &GotoRecordOpType, GotoRecordOp{ 2_n } }); break;
-                case 5:  //tmp = testOpOnSample(DatabaseOperation{ &NextOpType }); break;
-                case 6:  tmp = testOpOnSample(DatabaseOperation{ &PreviousOpType }); break;
-                case 7:  tmp = testOpOnSample(DatabaseOperation{ &StatusOpType }); break;
-                case 8:  tmp = testOpOnSample(DatabaseOperation{ &AddOpType, 𝐀𝐥𝐥𝐨𝐜𝐓𝐲𝐩𝐞( AddOp, alloc1, &AddOpType, (AddOp{ 𝐀𝐥𝐥𝐨𝐜𝐓𝐲𝐩𝐞( Entry, alloc4, &EntryType, (Entry{ Core::ListOps::s_list_create_3ᐸCStringᐳ([]() -> Core::CRope { const __CoreCpp::CChar* str = reinterpret_cast<const __CoreCpp::CChar*>("Bosque"); return Core::CRopeOps::s_crope_create(__CoreCpp::cbufferFromStringLiteral(0, 6, str)); }(), []() -> Core::CRope { const __CoreCpp::CChar* str = reinterpret_cast<const __CoreCpp::CChar*>("Yes"); return Core::CRopeOps::s_crope_create(__CoreCpp::cbufferFromStringLiteral(0, 3, str)); }(), []() -> Core::CRope { const __CoreCpp::CChar* str = reinterpret_cast<const __CoreCpp::CChar*>("Hybrid"); return Core::CRopeOps::s_crope_create(__CoreCpp::cbufferFromStringLiteral(0, 6, str)); }()) }) ) }) ) }); break;
-                case 9:  tmp = testOpOnSample(DatabaseOperation{ &ModifyOpType, 𝐀𝐥𝐥𝐨𝐜𝐓𝐲𝐩𝐞( ModifyOp, alloc1, &ModifyOpType, (ModifyOp{ 𝐀𝐥𝐥𝐨𝐜𝐓𝐲𝐩𝐞( Entry, alloc4, &EntryType, (Entry{ Core::ListOps::s_list_create_3ᐸCStringᐳ([]() -> Core::CRope { const __CoreCpp::CChar* str = reinterpret_cast<const __CoreCpp::CChar*>("Bosque"); return Core::CRopeOps::s_crope_create(__CoreCpp::cbufferFromStringLiteral(0, 6, str)); }(), []() -> Core::CRope { const __CoreCpp::CChar* str = reinterpret_cast<const __CoreCpp::CChar*>("Yes"); return Core::CRopeOps::s_crope_create(__CoreCpp::cbufferFromStringLiteral(0, 3, str)); }(), []() -> Core::CRope { const __CoreCpp::CChar* str = reinterpret_cast<const __CoreCpp::CChar*>("Hybrid"); return Core::CRopeOps::s_crope_create(__CoreCpp::cbufferFromStringLiteral(0, 6, str)); }()) }) ) }) ) }); break;
-                case 10: tmp = testOpOnSample(DatabaseOperation{ &RemoveOpType }); break;
+                case 1:  tmp = testOpOnSample(DatabaseOperation{ &NumRecordsOp𝐓𝐲𝐩𝐞 }); break;
+                case 2:  //tmp = testOpOnSample(DatabaseOperation{ &EndOp𝐓𝐲𝐩𝐞 }); break;
+                case 3:  //tmp = testOpOnSample(DatabaseOperation{ &ListOp𝐓𝐲𝐩𝐞 }); break;
+                case 4:  //tmp = testOpOnSample(DatabaseOperation{ &GotoRecordOp𝐓𝐲𝐩𝐞, GotoRecordOp{ 2_n } }); break;
+                case 5:  //tmp = testOpOnSample(DatabaseOperation{ &NextOp𝐓𝐲𝐩𝐞 }); break;
+                case 6:  tmp = testOpOnSample(DatabaseOperation{ &PreviousOp𝐓𝐲𝐩𝐞 }); break;
+                case 7:  tmp = testOpOnSample(DatabaseOperation{ &StatusOp𝐓𝐲𝐩𝐞 }); break;
+                case 8:  tmp = testOpOnSample(DatabaseOperation{ &AddOp𝐓𝐲𝐩𝐞, 𝐀𝐥𝐥𝐨𝐜𝐓𝐲𝐩𝐞( AddOp, alloc1, &AddOp𝐓𝐲𝐩𝐞, (AddOp{ 𝐀𝐥𝐥𝐨𝐜𝐓𝐲𝐩𝐞( Entry, alloc4, &Entry𝐓𝐲𝐩𝐞, (Entry{ Core::ListOps::s_list_create_3ᐸCStringᐳ([]() -> Core::CRope { const __CoreCpp::CChar* str = reinterpret_cast<const __CoreCpp::CChar*>("Bosque"); return Core::CRopeOps::s_crope_create(__CoreCpp::cbufferFromStringLiteral(0, 6, str)); }(), []() -> Core::CRope { const __CoreCpp::CChar* str = reinterpret_cast<const __CoreCpp::CChar*>("Yes"); return Core::CRopeOps::s_crope_create(__CoreCpp::cbufferFromStringLiteral(0, 3, str)); }(), []() -> Core::CRope { const __CoreCpp::CChar* str = reinterpret_cast<const __CoreCpp::CChar*>("Hybrid"); return Core::CRopeOps::s_crope_create(__CoreCpp::cbufferFromStringLiteral(0, 6, str)); }()) }) ) }) ) }); break;
+                case 9:  tmp = testOpOnSample(DatabaseOperation{ &ModifyOp𝐓𝐲𝐩𝐞, 𝐀𝐥𝐥𝐨𝐜𝐓𝐲𝐩𝐞( ModifyOp, alloc1, &ModifyOp𝐓𝐲𝐩𝐞, (ModifyOp{ 𝐀𝐥𝐥𝐨𝐜𝐓𝐲𝐩𝐞( Entry, alloc4, &Entry𝐓𝐲𝐩𝐞, (Entry{ Core::ListOps::s_list_create_3ᐸCStringᐳ([]() -> Core::CRope { const __CoreCpp::CChar* str = reinterpret_cast<const __CoreCpp::CChar*>("Bosque"); return Core::CRopeOps::s_crope_create(__CoreCpp::cbufferFromStringLiteral(0, 6, str)); }(), []() -> Core::CRope { const __CoreCpp::CChar* str = reinterpret_cast<const __CoreCpp::CChar*>("Yes"); return Core::CRopeOps::s_crope_create(__CoreCpp::cbufferFromStringLiteral(0, 3, str)); }(), []() -> Core::CRope { const __CoreCpp::CChar* str = reinterpret_cast<const __CoreCpp::CChar*>("Hybrid"); return Core::CRopeOps::s_crope_create(__CoreCpp::cbufferFromStringLiteral(0, 6, str)); }()) }) ) }) ) }); break;
+                case 10: tmp = testOpOnSample(DatabaseOperation{ &RemoveOp𝐓𝐲𝐩𝐞 }); break;
                 default: {
                     std::cout << "value does not correspond to an existing db operation! - " << op << std::endl;
                     return ;

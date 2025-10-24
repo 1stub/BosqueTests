@@ -2,7 +2,7 @@
 
 # Make sure these directories are correctly set!
 cwd=$(pwd)
-bosque=$cwd/../../BosqueCore
+bosque=$cwd/../../copy/BosqueCore
 cpp=$bosque/bin/src/cmd/analyzecpp.js
 
 cppout=$cwd/cppout
@@ -26,5 +26,5 @@ node $cpp $src
 
 cd $cppout
 make clean
-make BUILD=release
+make 
 ./output/memex
