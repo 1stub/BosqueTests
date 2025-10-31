@@ -1,3 +1,3 @@
 declare namespace Main;
 
-public function main(): Nat { return Map<Int, CString>::union(Map<Int, CString>{1i => 'a'}, Map<Int, CString>{3i => 'c', 2i => 'b'}).size(); }
+datatype Foo of | F1 { field f: Int; } | F2 { } & { function foo(): Int { return 3i; } } public function main(): Int { return F1::foo(); }
