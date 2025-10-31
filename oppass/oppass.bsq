@@ -2,10 +2,10 @@ declare namespace Main {
     using BSQAssembly;
 }
 
-public function main(): Bool
+public function main():Nat 
 {
     let explict = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::mini_ir);
     let simple = BSQAssembly::ConstantSimplification::process(explict);
 
-    return true;
+    return simple.allfuncs.size();
 }
