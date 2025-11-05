@@ -1,0 +1,15 @@
+declare namespace Main;
+
+function issome(opt: Option<Nat>): Nat {
+    if(opt)@@none {
+        return 0n;
+    }
+
+    return opt;
+}
+
+public function main(): Nat {
+    let ab = some(3n);
+
+    return issome(ab);
+}

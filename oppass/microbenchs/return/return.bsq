@@ -1,0 +1,11 @@
+declare namespace Main;
+
+function multi(a: Nat, b: Nat): Nat, Nat {
+    return a, b;
+}
+
+public function main(): Nat {
+    let a, b = multi(0n, 1n);
+
+    return b;
+}

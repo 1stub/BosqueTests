@@ -1,0 +1,15 @@
+declare namespace Main;
+
+concept Foo {
+    field a: Nat;
+}
+
+entity Bar provides Foo {
+    field b: Nat;
+}
+
+public function main(): Nat {
+    let fb = Bar{ 1n, 2n };
+
+    return fb.a + fb.b;
+}

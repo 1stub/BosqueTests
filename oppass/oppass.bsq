@@ -4,8 +4,30 @@ declare namespace Main {
 
 public function main():Nat 
 {
-    let explict = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::mini_ir);
-    let simple = BSQAssembly::ConstantSimplification::process(explict);
+    let explicitacc = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::acc);
+    let simpleacc = BSQAssembly::ConstantSimplification::process(explicitacc);
 
-    return simple.allfuncs.size();
+    let explicitarith = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::arith);
+    let simplearith = BSQAssembly::ExplicitifyTransform::process(explicitarith);
+
+    let explicitcond = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::cond);
+    let simplecond = BSQAssembly::ExplicitifyTransform::process(explicitcond);   
+
+    let explicitinherit = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::inherit);
+    let simpleinherit = BSQAssembly::ExplicitifyTransform::process(explicitinherit);   
+
+    let explicititest = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::tt);
+    let simpleitest = BSQAssembly::ExplicitifyTransform::process(explicititest);   
+
+    let explicitlist = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::lst);
+    let simplelist = BSQAssembly::ExplicitifyTransform::process(explicitlist);   
+
+    let explicitret = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::ret);
+    let simpleret = BSQAssembly::ExplicitifyTransform::process(explicitret);   
+
+    let sum = simpleacc.allfuncs.size() + simplearith.allfuncs.size() + simplecond.allfuncs.size() 
+            + simpleinherit.allfuncs.size() + simpleitest.allfuncs.size() + simplelist.allfuncs.size()
+            + simpleret.allfuncs.size();
+
+    return sum;
 }

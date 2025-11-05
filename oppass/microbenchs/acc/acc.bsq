@@ -1,0 +1,14 @@
+declare namespace Main;
+
+recursive function accumulate(acc: Nat): Nat {
+    if(acc < 10000n) {
+        return acc + 1n;
+    }
+    else {
+        return acc;
+    }
+}
+
+public function main(): Nat {
+    return accumulate(0n);
+}

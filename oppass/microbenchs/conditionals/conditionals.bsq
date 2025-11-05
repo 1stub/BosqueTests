@@ -1,0 +1,17 @@
+declare namespace Main;
+
+function eq(a: Nat, b: Nat): Bool {
+    if(a > b) {
+        return false;
+    }
+    elif(a == b) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+public function main(): Bool {
+    return eq(0n, 0n);
+}

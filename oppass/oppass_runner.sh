@@ -7,7 +7,7 @@ bsqir=$bosque/src/bsqir
 cbsqir=$cwd/bsqir
 cpp=$bosque/bin/src/cmd/analyzecpp.js
 
-mini=$cwd/mini_ir.bsq
+mini=$cwd/mini_irs.bsq
 
 cppout=$cwd/cppout
 src=$1

@@ -2,7 +2,7 @@ declare namespace Main;
 
 function addMultiplyDivSub(a: Int, b: Int, c: Int, d: Int): Int {
     let sum = a + b;
-    let product = sum * c;
+    let div = sum / c;
     let mul = product * d;
     let sub = mul - a;
 

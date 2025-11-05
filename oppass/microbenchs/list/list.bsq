@@ -1,0 +1,6 @@
+declare namespace Main;
+
+public function main(): Nat {
+    let l = List<Int>{1i};
+    return l.size();
+}
