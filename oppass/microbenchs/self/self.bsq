@@ -1,0 +1,16 @@
+declare namespace Main;
+
+datatype Foo using {
+    field val: Nat;
+}
+of 
+| Bar { }
+| Fizz { field f: Foo; }
+| Bazz { }
+;
+
+public function main(): Bool {
+    let f = Fizz{ 1n, Bar{ 2n } };
+
+    return f.f.val + f.val == 3n;
+}

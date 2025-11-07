@@ -1,0 +1,15 @@
+declare namespace Main;
+
+entity Foo {
+    field f: Nat;
+
+    method update(v: Nat): Foo {
+        return this[f=$f + v];
+    }
+}
+
+public function main(): Bool {
+    let f = Foo{ 1n };
+
+    return f.update(2n).f == 3n;
+}

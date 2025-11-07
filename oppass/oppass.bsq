@@ -8,30 +8,38 @@ public function main():Nat
     let simpleacc = BSQAssembly::ConstantSimplification::process(explicitacc);
 
     let explicitarith = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::arith);
-    let simplearith = BSQAssembly::ExplicitifyTransform::process(explicitarith);
+    let simplearith = BSQAssembly::ConstantSimplification::process(explicitarith);
 
     let explicitcond = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::cond);
-    let simplecond = BSQAssembly::ExplicitifyTransform::process(explicitcond);   
+    let simplecond = BSQAssembly::ConstantSimplification::process(explicitcond);   
 
     let explicitinherit = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::inherit);
-    let simpleinherit = BSQAssembly::ExplicitifyTransform::process(explicitinherit);   
+    let simpleinherit = BSQAssembly::ConstantSimplification::process(explicitinherit);   
 
     let explicititest = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::tt);
-    let simpleitest = BSQAssembly::ExplicitifyTransform::process(explicititest);   
+    let simpleitest = BSQAssembly::ConstantSimplification::process(explicititest);   
 
-    %%let explicitlist = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::lst);
-    %%let simplelist = BSQAssembly::ExplicitifyTransform::process(explicitlist);   
+    let explicitlambda = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::lambda);
+    let simplelambda = BSQAssembly::ConstantSimplification::process(explicitlambda);   
+
+    let explicitmeth = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::meth);
+    let simplemeth = BSQAssembly::ConstantSimplification::process(explicitmeth);   
 
     let explicitret = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::ret);
-    let simpleret = BSQAssembly::ExplicitifyTransform::process(explicitret);   
+    let simpleret = BSQAssembly::ConstantSimplification::process(explicitret);   
+
+    let explicitself = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::slf);
+    let simpleself = BSQAssembly::ConstantSimplification::process(explicitself);   
 
     let sum = simpleacc.allfuncs.size() + 
               simplearith.allfuncs.size() + 
               simplecond.allfuncs.size() + 
               simpleinherit.allfuncs.size() + 
               simpleitest.allfuncs.size() + 
-              %%simplelist.allfuncs.size() + 
-              simpleret.allfuncs.size();
+              simplelambda.allfuncs.size() + 
+              simplemeth.allfuncs.size() +
+              simpleret.allfuncs.size() +
+              simpleself.allfuncs.size();
 
     return sum;
 }

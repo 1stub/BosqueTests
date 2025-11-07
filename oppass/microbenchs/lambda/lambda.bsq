@@ -1,0 +1,18 @@
+declare namespace Main;
+
+function op(n: Nat, opp: fn(Nat) -> Bool): Bool {
+    return opp(n);
+}
+
+public function main(): Bool {
+    let ret = op(121n, fn(n: Nat) => {
+        if(n > 120n) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    });
+
+    return ret;
+}
