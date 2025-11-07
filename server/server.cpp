@@ -27,7 +27,7 @@
     //
     // Now these can change!
     //
-    constexpr size_t DEFAULT_WORKLIST_SIZE = 10ULL;
+    constexpr size_t DEFAULT_WORKLIST_SIZE = 600ULL;
 
     constexpr size_t NBODY_WORKLIST_SIZE = DEFAULT_WORKLIST_SIZE;
     constexpr size_t MIN_NBODY_STEPS = 37'500UL;

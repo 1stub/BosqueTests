@@ -283,7 +283,7 @@ const inherit: BSQAssembly::Assembly = BSQAssembly::Assembly{
 };
 
 %% ITest on options
-const tt: BSQAssembly::Assembly =BSQAssembly::Assembly{
+const tt: BSQAssembly::Assembly = BSQAssembly::Assembly{
     List<BSQAssembly::NamespaceConstDecl>{ },
     List<BSQAssembly::ConstMemberDecl>{
         BSQAssembly::ConstMemberDecl{ file="/home/anthony/repos/BosqueCore/bin/core/core.bsq", sinfo=BSQAssembly::SourceInfo{ line=30n, column=4n, pos=760n, span=5n }, fullns = List<CString>{'Core'}, declaredInNS='Core'<BSQAssembly::NamespaceKey>, attributes=List<BSQAssembly::DeclarationAttibute>{  },  name='zero'<BSQAssembly::Identifier>, declaredInType=BSQAssembly::NominalTypeSignature{ sinfo=BSQAssembly::SourceInfo{ line=27n, column=52n, pos=719n, span=6n }, tkeystr='Nat'<TypeKey> }, declaredType=BSQAssembly::NominalTypeSignature{ sinfo=BSQAssembly::SourceInfo{ line=30n, column=16n, pos=772n, span=3n }, tkeystr='Nat'<TypeKey> }, value=BSQAssembly::LiteralSimpleExpression{ sinfo=BSQAssembly::SourceInfo{ line=30n, column=22n, pos=778n, span=2n }, etype=BSQAssembly::NominalTypeSignature{ sinfo=BSQAssembly::SourceInfo{ line=27n, column=52n, pos=719n, span=6n }, tkeystr='Nat'<TypeKey> }, value='0n' } },
@@ -358,8 +358,9 @@ const tt: BSQAssembly::Assembly =BSQAssembly::Assembly{
         'Option<Nat>'<BSQAssembly::TypeKey>
     },
     BSQAssembly::TypeTopology{ ctopo=List<BSQAssembly::TypeKey>{ 'Bool'<BSQAssembly::TypeKey>, 'Nat'<BSQAssembly::TypeKey>, 'None'<BSQAssembly::TypeKey>, 'Some<Nat>'<BSQAssembly::TypeKey>, 'Option<Nat>'<BSQAssembly::TypeKey> }, sccs=List<List<BSQAssembly::TypeKey>>{  } }
-}; 
+};
 
+%*
 %% Super basic list creation
 const lst: BSQAssembly::Assembly = BSQAssembly::Assembly{
     List<BSQAssembly::NamespaceConstDecl>{ },
@@ -818,6 +819,7 @@ const lst: BSQAssembly::Assembly = BSQAssembly::Assembly{
         }
     }
 }; 
+*%
 
 %% String creation 
 %%const str: BSQAssembly::Assembly = 

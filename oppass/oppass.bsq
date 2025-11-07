@@ -19,15 +19,19 @@ public function main():Nat
     let explicititest = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::tt);
     let simpleitest = BSQAssembly::ExplicitifyTransform::process(explicititest);   
 
-    let explicitlist = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::lst);
-    let simplelist = BSQAssembly::ExplicitifyTransform::process(explicitlist);   
+    %%let explicitlist = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::lst);
+    %%let simplelist = BSQAssembly::ExplicitifyTransform::process(explicitlist);   
 
     let explicitret = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::ret);
     let simpleret = BSQAssembly::ExplicitifyTransform::process(explicitret);   
 
-    let sum = simpleacc.allfuncs.size() + simplearith.allfuncs.size() + simplecond.allfuncs.size() 
-            + simpleinherit.allfuncs.size() + simpleitest.allfuncs.size() + simplelist.allfuncs.size()
-            + simpleret.allfuncs.size();
+    let sum = simpleacc.allfuncs.size() + 
+              simplearith.allfuncs.size() + 
+              simplecond.allfuncs.size() + 
+              simpleinherit.allfuncs.size() + 
+              simpleitest.allfuncs.size() + 
+              %%simplelist.allfuncs.size() + 
+              simpleret.allfuncs.size();
 
     return sum;
 }
