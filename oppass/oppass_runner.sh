@@ -9,6 +9,9 @@ cpp=$bosque/bin/src/cmd/analyzecpp.js
 
 mini=$cwd/mini_irs.bsq
 
+server=$(<$cwd/server.cpp)
+headers=$(<$cwd/headers.hpp)
+
 cppout=$cwd/cppout
 src=$1
 
@@ -47,6 +50,30 @@ if [[ ${#bsqir_files[@]} -eq 0 ]]; then
 fi
 
 node $cpp $src ${bsqir_files[@]}
+
+# Append necessary server headers
+tmp=$(mktemp)
+awk -v headers="$headers" '{sub("#include \"emit.hpp\"", headers)}1' "$cppout/emit.cpp" > "$tmp"
+mv "$tmp" "$cppout/emit.cpp"
+
+# Replace main with custom code 
+# (we should really understand this awk code a bit better)
+srctmp=$(mktemp)
+awk -v src="$server" '
+    /__CoreCpp::[^ ]+ main\(\) noexcept  {/ {
+        print src
+        skip = 1
+        next
+    }
+    skip && /^    }$/ {
+        skip = 0
+        next
+    }
+    !skip { print }
+' "$cppout/emit.cpp" > "$srctmp" && mv "$srctmp" "$cppout/emit.cpp"
+
+testtmp=$(mktemp)
+awk -v type="$type" '{sub("REPLACEME", type)}1' "$cppout/emit.cpp" > "$testtmp" && mv "$testtmp" "$cppout/emit.cpp"
 
 cd $cppout
 make clean
