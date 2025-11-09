@@ -13,6 +13,9 @@ public function main():Nat
     let explicitcond = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::cond);
     let simplecond = BSQAssembly::ConstantSimplification::process(explicitcond);   
 
+    let explicitdt = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::dt);
+    let simpledt = BSQAssembly::ConstantSimplification::process(explicitdt);   
+
     let explicitinherit = BSQAssembly::ExplicitifyTransform::process(BSQAssembly::inherit);
     let simpleinherit = BSQAssembly::ConstantSimplification::process(explicitinherit);   
 
@@ -34,6 +37,7 @@ public function main():Nat
     let sum = simpleacc.allfuncs.size() + 
               simplearith.allfuncs.size() + 
               simplecond.allfuncs.size() + 
+              simpledt.allfuncs.size() +
               simpleinherit.allfuncs.size() + 
               simpleitest.allfuncs.size() + 
               simplelambda.allfuncs.size() + 

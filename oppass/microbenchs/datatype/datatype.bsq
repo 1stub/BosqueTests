@@ -1,0 +1,18 @@
+declare namespace Main;
+
+datatype Foo using {
+    field a: Int;
+    field b: Nat;
+}
+of
+| Fizz { field c: Bool; }
+| Buzz { field c: Bool; }
+;
+
+entity Bar {
+    field f: Foo;
+}
+
+public function main(): Bool {
+    return Bar{ Buzz{ 1i, 3n, false } }.f.b > 4n;
+}

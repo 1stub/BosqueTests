@@ -16,6 +16,7 @@ cpp=$bosque/bin/src/cmd/analyzecpp.js
 
 src=server.bsq
 cppout=$cwd/cppout
+common=$cppout/gc/src/runtime/common.h
 
 build=dev
 type=mixed
@@ -65,6 +66,16 @@ awk -v src="$server" '
 
 testtmp=$(mktemp)
 awk -v type="$type" '{sub("REPLACEME", type)}1' "$cppout/emit.cpp" > "$testtmp" && mv "$testtmp" "$cppout/emit.cpp"
+
+# Setup to be running with asserts off and packed metadata
+# FS is input field separator (so nothing here), RS defines a line
+# (record field separator)
+commontmp=$(mktemp)
+awk -v rmv="//#define BSQ_GC_CHECK_ENABLED\n//#define VERBOSE_HEADER" 'BEGIN { RS = ""; FS = "" } {
+    gsub(/#define BSQ_GC_CHECK_ENABLED\n#define VERBOSE_HEADER/, rmv)
+    print
+}' "$common" > "$commontmp"
+mv "$commontmp" "$common"
 
 cd $cppout
 make clean

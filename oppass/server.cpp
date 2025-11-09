@@ -3,6 +3,7 @@ __CoreCpp::Nat main() noexcept  {
         "acc",
         "arith", 
         "cond",
+        "dt",
         "inherit",
         "tt",
         "lambda",
@@ -20,7 +21,7 @@ __CoreCpp::Nat main() noexcept  {
     
     constexpr uint32_t BENCHMARK_RANDOM_SEED = 0xDEADBEEF;
 
-    std::random_device rd;
+//    std::random_device rd;
 //    std::mt19937 g(rd());
     std::mt19937 g(BENCHMARK_RANDOM_SEED);
     std::shuffle(worklist.begin(), worklist.end(), g);
@@ -41,6 +42,10 @@ __CoreCpp::Nat main() noexcept  {
         }
         else if (assemblyName == "cond") {
             BSQAssembly::Assembly* explicitt = BSQAssembly::ExplicitifyTransformᘏprocess(BSQAssembly::cond());
+            [[maybe_unused]] BSQAssembly::Assembly* simple = BSQAssembly::ConstantSimplificationᘏprocess(explicitt);
+        }
+        else if(assemblyName == "dt") {
+            BSQAssembly::Assembly* explicitt = BSQAssembly::ExplicitifyTransformᘏprocess(BSQAssembly::dt());
             [[maybe_unused]] BSQAssembly::Assembly* simple = BSQAssembly::ConstantSimplificationᘏprocess(explicitt);
         }
         else if (assemblyName == "inherit") {
@@ -66,6 +71,9 @@ __CoreCpp::Nat main() noexcept  {
         else if (assemblyName == "slf") {
             BSQAssembly::Assembly* explicitt = BSQAssembly::ExplicitifyTransformᘏprocess(BSQAssembly::slf());
             [[maybe_unused]] BSQAssembly::Assembly* simple = BSQAssembly::ConstantSimplificationᘏprocess(explicitt);
+        }
+        else {
+            std::cout << "Invalid test name!" << std::endl;
         }
     }
    
