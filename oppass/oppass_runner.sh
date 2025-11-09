@@ -7,13 +7,29 @@ bsqir=$bosque/src/bsqir
 cbsqir=$cwd/bsqir
 cpp=$bosque/bin/src/cmd/analyzecpp.js
 
+cppout=$cwd/cppout
+common=$cppout/gc/src/runtime/common.h
+makefile=$cppout/makefile
+
 mini=$cwd/mini_irs.bsq
+
+build=dev
 
 server=$(<$cwd/server.cpp)
 headers=$(<$cwd/headers.hpp)
 
-cppout=$cwd/cppout
 src=$1
+
+# Default run as monolith
+iterations=1
+
+if [[ $2 == "release" ]]; then 
+    build=release
+fi
+
+if [[ $# == 3 ]]; then
+    iterations=$3
+fi
 
 if [[ $# -eq 0 ]]; then
     echo "No source file provided!"
@@ -57,7 +73,6 @@ awk -v headers="$headers" '{sub("#include \"emit.hpp\"", headers)}1' "$cppout/em
 mv "$tmp" "$cppout/emit.cpp"
 
 # Replace main with custom code 
-# (we should really understand this awk code a bit better)
 srctmp=$(mktemp)
 awk -v src="$server" '
     /__CoreCpp::[^ ]+ main\(\) noexcept  {/ {
@@ -72,10 +87,31 @@ awk -v src="$server" '
     !skip { print }
 ' "$cppout/emit.cpp" > "$srctmp" && mv "$srctmp" "$cppout/emit.cpp"
 
-testtmp=$(mktemp)
-awk -v type="$type" '{sub("REPLACEME", type)}1' "$cppout/emit.cpp" > "$testtmp" && mv "$testtmp" "$cppout/emit.cpp"
+# Setup to be running with asserts off and packed metadata
+# FS is input field separator (so nothing here), RS defines a line
+# (record field separator)
+commontmp=$(mktemp)
+awk -v rmv="//#define BSQ_GC_CHECK_ENABLED\n//#define VERBOSE_HEADER" 'BEGIN { RS = ""; FS = "" } {
+    gsub(/#define BSQ_GC_CHECK_ENABLED\n#define VERBOSE_HEADER/, rmv)
+    print
+}' "$common" > "$commontmp"
+mv "$commontmp" "$common"
+
+
+# Add iteration count
+cpptmp=$(mktemp)
+awk -v its="$iterations" '{sub("ITERATIONS", its)}1' "$cppout/emit.cpp" > "$cpptmp" 
+mv "$cpptmp" "$cppout/emit.cpp"
+
+# Release triggers incorrect infinite loop and array bounds errors so ignore them
+mkrplmt="CFLAGS_OPT.release=-O2 -march=x86-64-v3 -Wno-infinite-recursion -Wno-array-bounds"
+if [[ $build -eq "release" ]]; then 
+    makefiletmp=$(mktemp)
+    awk -v mkrp="$mkrplmt" '{sub("CFLAGS_OPT.release=-O2 -march=x86-64-v3", mkrp)}1' "$makefile" > "$makefiletmp"
+    mv "$makefiletmp" "$makefile"
+fi
 
 cd $cppout
 make clean
-make
+make BUILD=$build
 ./output/memex

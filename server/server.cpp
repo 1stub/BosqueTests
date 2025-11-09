@@ -415,19 +415,24 @@
         if(mode == "nbody") {
             auto worklist = nbodyworklist_create(gen);
             nbody_run(worklist);
+
+            calculate_and_print_timing_stats();
         }
         else if(mode == "db") {
             auto worklist = dbworklist_create(gen);
             db_run(worklist);
+
+            calculate_and_print_timing_stats();
         }
         else if(mode == "raytrace") {
             auto worklist = raytraceworklist_create(gen);
             raytrace_run(worklist);
+
+            calculate_and_print_timing_stats();
         }
         else if(mode == "mixed") {
             auto worklist = mixedworklist_create(gen);
             mixed_run(worklist);
-            calculate_and_print_timing_stats();
             calculate_and_print_server_stats();
         }
         else {

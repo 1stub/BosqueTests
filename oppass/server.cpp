@@ -12,17 +12,25 @@ __CoreCpp::Nat main() noexcept  {
     };
     
     std::vector<std::string> worklist;    
-    for (int i = 0; i < 100'000; i++) {
+    for (int i = 0; i < ITERATIONS; i++) {
         for (const std::string& assembly : baseAssemblies) {
             worklist.push_back(assembly);
         }
     }
     
+    constexpr uint32_t BENCHMARK_RANDOM_SEED = 0xDEADBEEF;
+
     std::random_device rd;
-    std::mt19937 g(rd());
+//    std::mt19937 g(rd());
+    std::mt19937 g(BENCHMARK_RANDOM_SEED);
     std::shuffle(worklist.begin(), worklist.end(), g);
-    
+   
+    int i = 0;
     for (const auto& assemblyName : worklist) {
+        if(i++ % 1'000 == 0) {
+            std::cout << i << std::endl;
+        }
+        
         if (assemblyName == "acc") {
             BSQAssembly::Assembly* explicitt = BSQAssembly::ExplicitifyTransformᘏprocess(BSQAssembly::acc());
             [[maybe_unused]] BSQAssembly::Assembly* simple = BSQAssembly::ConstantSimplificationᘏprocess(explicitt);
