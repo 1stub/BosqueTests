@@ -1,0 +1,66 @@
+%%
+%% This is a Bosque implementation of binary-trees from https://benchmarksgame-team.pages.debian.net/benchmarksgame/program/binarytrees-graalvmaot-7.html
+%%
+
+declare namespace Main;
+
+public function main(): Int {
+    let n = 10i;
+    let maxDepth = if(n < min_depth + 2i) 
+        then min_depth + 2i 
+        else n;
+    let stretchDepth = maxDepth + 1i;
+
+    let stretchTree = bottomUpTree(stretchDepth);
+    let stretchCheck = itemCheck(stretchTree);
+
+    let longLivedTree = bottomUpTree(maxDepth);
+
+    let results = executeDepths(min_depth, maxDepth, maxDepth);
+    
+    let longLivedCheck = itemCheck(longLivedTree);
+
+    return 0i;
+}
+
+const min_depth: Int = 4i;
+
+datatype Tree of
+| Node { left: Tree, right: Tree }
+| Empty {}
+;
+
+function bottomUpTree(depth: Int): Tree {
+    return if(depth > 0i)
+        then Node{ bottomUpTree(depth - 1i), bottomUpTree(depth - 1i) }
+        else Empty{};
+}
+
+recursive function itemCheck(t: Tree): Int {
+    match(t)@ {
+        |Node  => { return 1i + itemCheck($t.left) + itemCheck($t.right); }
+        |Empty => { return 1i; }
+    }
+}
+
+function executeDepths(currentDepth: Int, maxDepth: Int, absoluteMaxDepth: Int): Int {
+    if(currentDepth > maxDepth) {
+        return 0i;
+    }
+
+    %% Need a pow op here
+    let iterations = %*1 <<*% (absoluteMaxDepth - currentDepth + min_depth);
+    let check = processTrees(currentDepth, iterations, 0i);
+    
+    return executeDepths[recursive](currentDepth + 2i, maxDepth, absoluteMaxDepth);
+}
+
+recursive function processTrees(depth: Int, iterations: Int, current: Int): Int {
+    if(current >= iterations) {
+        return 0i;
+    }
+
+    let tree = bottomUpTree(depth);
+    let check = itemCheck(tree);
+    return check + processTrees(depth, iterations, current + 1i);
+}
