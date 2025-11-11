@@ -7,6 +7,12 @@
  * *reset*
  */
 
+/*
+ * G1: java -XX:+UseG1GC -XX:+PrintGCDetails -Xloggc:./g1-gc.log rbt.java 
+ * ZGC: java -XX:+UseShenandoahGC -XX:+PrintGCDetails -Xloggc:./shenandoah-gc.log rbt.java
+ * Shenandoah: java -XX:+UseZGC -XX:+PrintGCDetails -Xloggc:./z-gc.log rbt.java 
+ */
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;

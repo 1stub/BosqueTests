@@ -29,8 +29,7 @@ function executeDepths(currentDepth: Nat, maxDepth: Nat, absoluteMaxDepth: Nat, 
         return acc;
     }
 
-    %% Need a pow op here
-    let iterations = Nat::pow(2n, (absoluteMaxDepth - currentDepth + min_depth));
+    let iterations = 2n.pow(absoluteMaxDepth - currentDepth + min_depth);
     let check = processTrees(currentDepth, iterations, 0n);
 
     let eit = iterations.toCString();
@@ -52,7 +51,7 @@ recursive function processTrees(depth: Nat, iterations: Nat, current: Nat): Nat 
 }
 
 public function main(): Nat {
-    let n = 12n;
+    let n = 21n;
     let maxDepth = if(n < min_depth + 2n) 
         then min_depth + 2n 
         else n;

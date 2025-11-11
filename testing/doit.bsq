@@ -1,3 +1,3 @@
 declare namespace Main;
 
-public function main(): Bool { return 2n.pow(100n) == 0n; }
+ entity Foo { field f: Int = 0i; } public function main(): Int { return Foo{}.f; }

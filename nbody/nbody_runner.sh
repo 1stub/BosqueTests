@@ -2,7 +2,7 @@
 
 # Make sure these directories are correctly set!
 cwd=$(pwd)
-bosque=$cwd/../../copy/BosqueCore
+bosque=$cwd/../../BosqueCore
 cpp=$bosque/bin/src/cmd/analyzecpp.js
 
 cppout=$cwd/cppout
