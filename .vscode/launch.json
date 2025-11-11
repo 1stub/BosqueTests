@@ -4,7 +4,7 @@
             "name": "(UDB)  Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/oppass/cppout/output/memex",
+            "program": "${workspaceFolder}/rbt/cppout/output/memex",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
