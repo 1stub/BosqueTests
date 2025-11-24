@@ -30,17 +30,17 @@
     constexpr size_t DEFAULT_WORKLIST_SIZE = 600ULL;
 
     constexpr size_t NBODY_WORKLIST_SIZE = DEFAULT_WORKLIST_SIZE;
-    constexpr size_t MIN_NBODY_STEPS = 37'500UL;
-    constexpr size_t MAX_NBODY_STEPS = 37'500UL;
+    constexpr size_t MIN_NBODY_STEPS = 50'500UL;
+    constexpr size_t MAX_NBODY_STEPS = 50'500UL;
 
     constexpr size_t DB_WORKLIST_SIZE = DEFAULT_WORKLIST_SIZE;
-    constexpr size_t MIN_DB_STEPS = 5'000UL;
-    constexpr size_t MAX_DB_STEPS = 5'000UL;
+    constexpr size_t MIN_DB_STEPS = 8'000UL;
+    constexpr size_t MAX_DB_STEPS = 8'000UL;
     constexpr size_t NUM_DB_OPS = 10UL;
 
     constexpr size_t RAYTRACE_WORKLIST_SIZE = DEFAULT_WORKLIST_SIZE;
-    constexpr size_t MIN_RAYTRACE_STEPS = 50'000UL;
-    constexpr size_t MAX_RAYTRACE_STEPS = 50'000UL;
+    constexpr size_t MIN_RAYTRACE_STEPS = 80'000UL;
+    constexpr size_t MAX_RAYTRACE_STEPS = 80'000UL;
     constexpr size_t RAYTRACE_WIN_WIDTH = 1920UL;
     constexpr size_t RAYTRACE_WIN_HEIGHT = 1080UL;
 
@@ -256,7 +256,9 @@
         BenchmarkTimer timer;
         timer.start();
     
+        int i = 0;
         for(MixedOp& e : worklist) {
+            std::cout << i++ << std::endl;
             switch(e.type) {
                 case OpType::NBODY:    nbody_bench(e.nbodywork); break;
                 case OpType::DB:       db_bench(e.dbbatch); break;
@@ -433,6 +435,8 @@
         else if(mode == "mixed") {
             auto worklist = mixedworklist_create(gen);
             mixed_run(worklist);
+
+            calculate_and_print_timing_stats();
             calculate_and_print_server_stats();
         }
         else {

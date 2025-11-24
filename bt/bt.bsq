@@ -1,0 +1,73 @@
+%%
+%% This is a Bosque implementation of binary-trees from https://benchmarksgame-team.pages.debian.net/benchmarksgame/program/binarytrees-graalvmaot-7.html
+%%
+
+declare namespace Main;
+
+const min_depth: Nat = 4n;
+
+datatype Tree of
+| Node { left: Tree, right: Tree }
+| Empty {}
+;
+
+recursive function bottomUpTree(depth: Nat): Tree {
+    return if(depth > 0n)
+        then Node{ bottomUpTree[recursive](depth - 1n), bottomUpTree[recursive](depth - 1n) }
+        else Empty{};
+}
+
+recursive function itemCheck(t: Tree): Nat {
+    match(t)@ {
+        |Node  => { return 1n + itemCheck($t.left) + itemCheck($t.right); }
+        |Empty => { return 1n; }
+    }
+}
+
+function executeDepths(depth: Nat, maxDepth: Nat, acc: List<CString>): List<CString> {
+    return Algorithm::while<(|Nat, List<CString>|)>((|depth, acc|),
+        pred(iterator) => iterator.0 <= maxDepth,
+        fn(iterator) => {
+            let d, cacc = iterator;
+
+            let iterations = 2n.pow(maxDepth - d + min_depth);
+            let check = processTrees(1n, iterations, d);
+
+            let eit = iterations.toCString();
+            let ed = d.toCString();
+            let echk = check.toCString();
+            let res = CString::concat(eit, ' trees of d ', ed, ' check: ', echk);
+
+            return d + 2n, cacc.pushBack(res);
+        }).1;
+}
+
+recursive function processTrees(i: Nat, maxIterations: Nat, depth: Nat): Nat {
+    return Algorithm::while<(|Nat, Nat|)>((|i, 0n|),
+        pred(iterator) => iterator.0 <= maxIterations,
+        fn(iterator) => {
+            let tree = bottomUpTree(depth);
+            let check = itemCheck(tree);
+            return iterator.0 + 1n, iterator.1 + check;
+        }).1;
+}
+
+public function main(): Nat {
+    let n = 21n;
+    let maxDepth = if(n < min_depth + 2n) 
+        then min_depth + 2n 
+        else n;
+    let stretchDepth = maxDepth + 1n;
+
+    %% We dont have any way to prNat results for cpp runtime yet
+    let stretchTree = bottomUpTree(stretchDepth);
+    let stretchCheck = itemCheck(stretchTree);
+
+    let longLivedTree = bottomUpTree(maxDepth);
+
+    let results = executeDepths(min_depth, maxDepth, List<CString>{});
+    
+    let longLivedCheck = itemCheck(longLivedTree);
+
+    return stretchCheck + longLivedCheck + results.size();
+}
