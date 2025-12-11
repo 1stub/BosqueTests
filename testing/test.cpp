@@ -19,15 +19,39 @@ struct DecsProcessor {
     std::list<size_t> worklist;
 
     bool canrun;
+    bool merging;
     bool shouldstop;
 
-    DecsProcessor(): cv(), mtx(), worker(&DecsProcessor::processDecs, this), worklist(), canrun(false) {}
+    DecsProcessor(): cv(), mtx(), worker(&DecsProcessor::processDecs, this), worklist(), canrun(false), merging(false), shouldstop(false) {}
+
+    void requestMergeAndPause(std::unique_lock<std::mutex>& lk)
+    {
+        this->canrun = false;
+        this->merging = true;
+        this->cv.notify_one();
+
+        // Once canrun is false we know the decs thread ackd our merge
+        cv.wait(lk, [this]{ 
+            std::cout << "paused: " << this->canrun << std::endl;
+            return !this->canrun; 
+        });
+    }
+
+    void resumeAfterMerge(std::unique_lock<std::mutex>& lk)
+    {
+        this->canrun = true;
+        this->merging = false;
+        lk.unlock();
+        this->cv.notify_one();
+    }
 
     void processDecs()
     {
         while(true) {
             std::unique_lock lk(this->mtx);
-            cv.wait(lk, [this]{ return this->canrun || this->shouldstop; });
+            cv.wait(lk, [this]{ 
+                return this->shouldstop || (this->canrun && !this->merging); 
+            });
 
             if(this->shouldstop) {
                 break;
@@ -61,27 +85,9 @@ static void mergeRemainingWork()
 static void pauseDecsAndMerge()
 {
     std::unique_lock lk(decs.mtx);
-    decs.canrun = false;
-    decs.cv.notify_one();
-
-    //
-    // We will want to use the cv to wait the decs thread
-    // instead of forced sleep
-    // Maybe two methods, requestMergeAndPause, and resumeAfterMerge
-    // that will be called form here
-    //
-
-    // Need to make sure the decs thread is ready
-    lk.unlock();
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    lk.lock();
-
-    // Decs should be waiting now
+    decs.requestMergeAndPause(lk);
     mergeRemainingWork();
-
-    decs.canrun = true;
-    lk.unlock();
-    decs.cv.notify_one();
+    decs.resumeAfterMerge(lk);
 }
 
 static void processSomeWork()

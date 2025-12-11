@@ -1,0 +1,41 @@
+==================
+WARNING: ThreadSanitizer: data race (pid=22173)
+  Read of size 1 at 0x7e2fe51ea2c4 by thread T1 (mutexes: write M0):
+    #0 DecsProcessor::process(BSQMemoryTheadLocalInfo*) /home/anthony/repos/BosqueTests/server/cppout/gc/src/runtime/memory/threadinfo.h:114 (memex+0xd1f1) (BuildId: 03c718d8dd672c058210fc9e5799e155dbfd9f32)
+    #1 void std::__invoke_impl<void, void (DecsProcessor::*)(BSQMemoryTheadLocalInfo*), DecsProcessor*, BSQMemoryTheadLocalInfo*>(std::__invoke_memfun_deref, void (DecsProcessor::*&&)(BSQMemoryTheadLocalInfo*), DecsProcessor*&&, BSQMemoryTheadLocalInfo*&&) /usr/include/c++/13/bits/invoke.h:74 (memex+0xd152) (BuildId: 03c718d8dd672c058210fc9e5799e155dbfd9f32)
+    #2 std::__invoke_result<void (DecsProcessor::*)(BSQMemoryTheadLocalInfo*), DecsProcessor*, BSQMemoryTheadLocalInfo*>::type std::__invoke<void (DecsProcessor::*)(BSQMemoryTheadLocalInfo*), DecsProcessor*, BSQMemoryTheadLocalInfo*>(void (DecsProcessor::*&&)(BSQMemoryTheadLocalInfo*), DecsProcessor*&&, BSQMemoryTheadLocalInfo*&&) /usr/include/c++/13/bits/invoke.h:96 (memex+0xd152)
+    #3 void std::thread::_Invoker<std::tuple<void (DecsProcessor::*)(BSQMemoryTheadLocalInfo*), DecsProcessor*, BSQMemoryTheadLocalInfo*> >::_M_invoke<0ul, 1ul, 2ul>(std::_Index_tuple<0ul, 1ul, 2ul>) /usr/include/c++/13/bits/std_thread.h:292 (memex+0xd152)
+    #4 std::thread::_Invoker<std::tuple<void (DecsProcessor::*)(BSQMemoryTheadLocalInfo*), DecsProcessor*, BSQMemoryTheadLocalInfo*> >::operator()() /usr/include/c++/13/bits/std_thread.h:299 (memex+0xd152)
+    #5 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (DecsProcessor::*)(BSQMemoryTheadLocalInfo*), DecsProcessor*, BSQMemoryTheadLocalInfo*> > >::_M_run() /usr/include/c++/13/bits/std_thread.h:244 (memex+0xd152)
+    #6 <null> <null> (libstdc++.so.6+0xecdb3) (BuildId: ca77dae775ec87540acd7218fa990c40d1c94ab1)
+
+  Previous write of size 1 at 0x7e2fe51ea2c4 by main thread:
+    #0 DecsProcessor::DecsProcessor(BSQMemoryTheadLocalInfo*) /home/anthony/repos/BosqueTests/server/cppout/gc/src/runtime/memory/threadinfo.h:70 (memex+0xcb73) (BuildId: 03c718d8dd672c058210fc9e5799e155dbfd9f32)
+    #1 BSQMemoryTheadLocalInfo::BSQMemoryTheadLocalInfo() /home/anthony/repos/BosqueTests/server/cppout/gc/src/runtime/memory/threadinfo.h:205 (memex+0xcb73)
+    #2 __tls_init /home/anthony/repos/BosqueTests/server/cppout/gc/src/runtime/memory/threadinfo.cpp:9 (memex+0xcb73)
+    #3 __tls_init /home/anthony/repos/BosqueTests/server/cppout/gc/src/runtime/memory/threadinfo.cpp:9 (memex+0xcb73)
+    #4 main /home/anthony/repos/BosqueTests/server/cppout/emit.cpp:5488 (memex+0x5381) (BuildId: 03c718d8dd672c058210fc9e5799e155dbfd9f32)
+
+  Location is TLS of main thread.
+
+  Mutex M0 (0x7e2fe51ea248) created at:
+    #0 pthread_mutex_lock ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1341 (libtsan.so.2+0x59a13) (BuildId: 38097064631f7912bd33117a9c83d08b42e15571)
+    #1 __gthread_mutex_lock /usr/include/x86_64-linux-gnu/c++/13/bits/gthr-default.h:749 (memex+0xd1ca) (BuildId: 03c718d8dd672c058210fc9e5799e155dbfd9f32)
+    #2 std::mutex::lock() /usr/include/c++/13/bits/std_mutex.h:113 (memex+0xd1ca)
+    #3 std::unique_lock<std::mutex>::lock() /usr/include/c++/13/bits/unique_lock.h:141 (memex+0xd1ca)
+    #4 std::unique_lock<std::mutex>::unique_lock(std::mutex&) /usr/include/c++/13/bits/unique_lock.h:71 (memex+0xd1ca)
+    #5 DecsProcessor::process(BSQMemoryTheadLocalInfo*) /home/anthony/repos/BosqueTests/server/cppout/gc/src/runtime/memory/threadinfo.h:113 (memex+0xd1ca)
+    #6 void std::__invoke_impl<void, void (DecsProcessor::*)(BSQMemoryTheadLocalInfo*), DecsProcessor*, BSQMemoryTheadLocalInfo*>(std::__invoke_memfun_deref, void (DecsProcessor::*&&)(BSQMemoryTheadLocalInfo*), DecsProcessor*&&, BSQMemoryTheadLocalInfo*&&) /usr/include/c++/13/bits/invoke.h:74 (memex+0xd152) (BuildId: 03c718d8dd672c058210fc9e5799e155dbfd9f32)
+    #7 std::__invoke_result<void (DecsProcessor::*)(BSQMemoryTheadLocalInfo*), DecsProcessor*, BSQMemoryTheadLocalInfo*>::type std::__invoke<void (DecsProcessor::*)(BSQMemoryTheadLocalInfo*), DecsProcessor*, BSQMemoryTheadLocalInfo*>(void (DecsProcessor::*&&)(BSQMemoryTheadLocalInfo*), DecsProcessor*&&, BSQMemoryTheadLocalInfo*&&) /usr/include/c++/13/bits/invoke.h:96 (memex+0xd152)
+    #8 void std::thread::_Invoker<std::tuple<void (DecsProcessor::*)(BSQMemoryTheadLocalInfo*), DecsProcessor*, BSQMemoryTheadLocalInfo*> >::_M_invoke<0ul, 1ul, 2ul>(std::_Index_tuple<0ul, 1ul, 2ul>) /usr/include/c++/13/bits/std_thread.h:292 (memex+0xd152)
+    #9 std::thread::_Invoker<std::tuple<void (DecsProcessor::*)(BSQMemoryTheadLocalInfo*), DecsProcessor*, BSQMemoryTheadLocalInfo*> >::operator()() /usr/include/c++/13/bits/std_thread.h:299 (memex+0xd152)
+    #10 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (DecsProcessor::*)(BSQMemoryTheadLocalInfo*), DecsProcessor*, BSQMemoryTheadLocalInfo*> > >::_M_run() /usr/include/c++/13/bits/std_thread.h:244 (memex+0xd152)
+    #11 <null> <null> (libstdc++.so.6+0xecdb3) (BuildId: ca77dae775ec87540acd7218fa990c40d1c94ab1)
+
+  Thread T1 (tid=22175, running) created by main thread at:
+    #0 pthread_create ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1022 (libtsan.so.2+0x5ac1a) (BuildId: 38097064631f7912bd33117a9c83d08b42e15571)
+    #1 std::thread::_M_start_thread(std::unique_ptr<std::thread::_State, std::default_delete<std::thread::_State> >, void (*)()) <null> (libstdc++.so.6+0xeceb0) (BuildId: ca77dae775ec87540acd7218fa990c40d1c94ab1)
+    #2 main /home/anthony/repos/BosqueTests/server/cppout/emit.cpp:5488 (memex+0x5381) (BuildId: 03c718d8dd672c058210fc9e5799e155dbfd9f32)
+
+SUMMARY: ThreadSanitizer: data race /home/anthony/repos/BosqueTests/server/cppout/gc/src/runtime/memory/threadinfo.h:114 in DecsProcessor::process(BSQMemoryTheadLocalInfo*)
+==================
