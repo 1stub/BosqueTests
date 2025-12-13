@@ -3,130 +3,135 @@
 #include <cassert>
 
 #include <cstdlib>
+#include <chrono>
 
 #include <list>
 #include <mutex>
 #include <thread>
 #include <condition_variable>
 
-#define NUM_COLLECTIONS 50
+#define NUM_COLLECTIONS 1'000
+
+size_t g_thd_cntr;
 
 struct DecsProcessor {
-    std::condition_variable cv;
     std::mutex mtx;
-    std::jthread worker;
+    std::condition_variable cv;
+    std::unique_ptr<std::thread> thd;    
 
-    std::list<size_t> worklist;
+    std::list<int> work;
 
-    bool canrun;
-    bool merging;
-    bool shouldstop;
+    enum class State {
+        Running,
+        Pausing,
+        Paused,
+        Stopping,
+        Stopped
+    };
+    State st;
 
-    DecsProcessor(): cv(), mtx(), worker(&DecsProcessor::processDecs, this), worklist(), canrun(false), merging(false), shouldstop(false) {}
+    // We should start paused and ensure no thread has been created yet
+    DecsProcessor(): mtx(), cv(), thd(nullptr), work(), st(State::Paused) {}
 
-    void requestMergeAndPause(std::unique_lock<std::mutex>& lk)
+    // Delay start to ensure rest of fields are properly setup (and those of other objects)
+    void init()
     {
-        this->canrun = false;
-        this->merging = true;
-        this->cv.notify_one();
-
-        // Once canrun is false we know the decs thread ackd our merge
-        cv.wait(lk, [this]{ 
-            std::cout << "paused: " << this->canrun << std::endl;
-            return !this->canrun; 
-        });
+        this->thd = std::make_unique<std::thread>([this] { this->process(); });
+        g_thd_cntr++;
     }
 
-    void resumeAfterMerge(std::unique_lock<std::mutex>& lk)
+    void changeStateFromMain(State nst, State ack)
     {
-        this->canrun = true;
-        this->merging = false;
-        lk.unlock();
+        this->st = nst;
+        this->cv.notify_one();
+        std::unique_lock lk(this->mtx);
+        this->cv.wait(lk, [this, ack]{ return this->st == ack; });
+    }
+
+    void changeStateFromWorker(State nst, std::unique_lock<std::mutex>& lk)
+    {
+        this->st = nst;
         this->cv.notify_one();
     }
 
-    void processDecs()
+    void pause()
     {
+        if(this->st == State::Paused) {
+            return ;
+        }
+        
+        this->changeStateFromMain(State::Pausing, State::Paused);
+    }
+
+    void resume()
+    {
+        this->st = State::Running;
+        this->cv.notify_one();
+    }
+
+    void stop()
+    {
+        this->pause(); // Ensure we are waiting
+        this->changeStateFromMain(State::Stopping, State::Stopped);
+
+        this->thd->join();
+        if(this->thd->joinable()) {
+            std::cerr << "Thread did not finish joining!\n";
+            std::abort();
+        }
+
+        g_thd_cntr--;
+    }
+
+    void process()
+    {
+        std::unique_lock lk(this->mtx); // Creates a lock but says nothing about ownership
         while(true) {
-            std::unique_lock lk(this->mtx);
-            cv.wait(lk, [this]{ 
-                return this->shouldstop || (this->canrun && !this->merging); 
-            });
+            this->cv.wait(lk, [this]
+                { return this->st != State::Paused; }
+            );
 
-            if(this->shouldstop) {
-                break;
+            if(this->st == State::Stopping) {
+                this->changeStateFromWorker(State::Stopped, lk);
+                return ;
             }
 
-            // Have been granted permission to do some work 
-            while(!this->worklist.empty()) {
-                this->worklist.pop_front();
+            while(!this->work.empty()) {
+                if(this->st != State::Running) break;
+                this->work.pop_front(); // do some work
             }
+            
+            this->changeStateFromWorker(State::Paused, lk);
         }
     }
 };
-static DecsProcessor decs;
-static std::list<size_t> work;
 
-static void runAllocator(size_t allocs)
-{
-    for(size_t i = 0; i < allocs; i++) {
-        work.push_back(i);
-    }
-}
+thread_local DecsProcessor g_dp;
 
-static void mergeRemainingWork()
+int main()
 {
-    for(const auto& e : work) {
-        decs.worklist.push_back(e);
-    }
-    work.clear();
-}
+    using namespace std::chrono_literals;
+    g_dp.init();
 
-static void pauseDecsAndMerge()
-{
-    std::unique_lock lk(decs.mtx);
-    decs.requestMergeAndPause(lk);
-    mergeRemainingWork();
-    decs.resumeAfterMerge(lk);
-}
-
-static void processSomeWork()
-{
-    size_t halfsize = work.size() / 2;
-    for(size_t i = 0; i < halfsize; i++) {
-        work.pop_front();
-    }  
-}
-
-static bool finishedWork()
-{
-    return work.empty();
-}
-
-static void collect()
-{
-    processSomeWork();
-    
-    if(!finishedWork()) {
-        pauseDecsAndMerge();
-    }
-}
-
-int main() 
-{
-    // Do nontrivial amount of work
     for(int i = 0; i < NUM_COLLECTIONS; i++) {
-        size_t nallocs = rand() % 50'000;
-        std::cout << "Collection " << i << "; Allocs: " << nallocs << std::endl;
-        runAllocator(nallocs);
-        collect();
+        std::this_thread::sleep_for(10ms);
+
+        // Lets pause for the durration of the collection
+        g_dp.pause();
+
+        // Merge in "work" that would have been from the allocator
+        const int nwork = 10'000;
+        for(int i = 0; i < nwork; i++)
+            g_dp.work.push_back(i);
+
+        // Process half
+        for(int i = 0; i < nwork/2; i++)
+            g_dp.work.pop_front();
+
+        g_dp.resume();
     }
 
-    // Just for simplicity force decs to stop
-    std::unique_lock lk(decs.mtx);
-    decs.shouldstop = true;
-    lk.unlock();
-    decs.cv.notify_one();
+    g_dp.stop();
 
     return 0;
 }
