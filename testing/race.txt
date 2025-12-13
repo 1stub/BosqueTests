@@ -1,0 +1,271 @@
+==================
+WARNING: ThreadSanitizer: data race (pid=33190)
+  Write of size 4 at 0x7f4713ebbf78 by main thread:
+    #0 DecsProcessor::resume() /home/anthony/repos/BosqueTests/testing/test.cpp:68 (a.out+0x297c) (BuildId: 7fce1dde4dba2ffb0f491f29ac99d16ffcf3bd67)
+    #1 main /home/anthony/repos/BosqueTests/testing/test.cpp:131 (a.out+0x297c)
+
+  Previous read of size 4 at 0x7f4713ebbf78 by thread T1 (mutexes: write M0):
+    #0 DecsProcessor::process()::{lambda()#1}::operator()() const /home/anthony/repos/BosqueTests/testing/test.cpp:91 (a.out+0x35ed) (BuildId: 7fce1dde4dba2ffb0f491f29ac99d16ffcf3bd67)
+    #1 void std::condition_variable::wait<DecsProcessor::process()::{lambda()#1}>(std::unique_lock<std::mutex>&, DecsProcessor::process()::{lambda()#1}) /usr/include/c++/13/condition_variable:104 (a.out+0x35ed)
+    #2 DecsProcessor::process() /home/anthony/repos/BosqueTests/testing/test.cpp:90 (a.out+0x35ed)
+    #3 DecsProcessor::init()::{lambda()#1}::operator()() const /home/anthony/repos/BosqueTests/testing/test.cpp:39 (a.out+0x35ed)
+    #4 void std::__invoke_impl<void, DecsProcessor::init()::{lambda()#1}>(std::__invoke_other, DecsProcessor::init()::{lambda()#1}&&) /usr/include/c++/13/bits/invoke.h:61 (a.out+0x35ed)
+    #5 std::__invoke_result<DecsProcessor::init()::{lambda()#1}>::type std::__invoke<DecsProcessor::init()::{lambda()#1}>(DecsProcessor::init()::{lambda()#1}&&) /usr/include/c++/13/bits/invoke.h:96 (a.out+0x35ed)
+    #6 void std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> >::_M_invoke<0ul>(std::_Index_tuple<0ul>) /usr/include/c++/13/bits/std_thread.h:292 (a.out+0x35ed)
+    #7 std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> >::operator()() /usr/include/c++/13/bits/std_thread.h:299 (a.out+0x35ed)
+    #8 std::thread::_State_impl<std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> > >::_M_run() /usr/include/c++/13/bits/std_thread.h:244 (a.out+0x35ed)
+    #9 <null> <null> (libstdc++.so.6+0xecdb3) (BuildId: ca77dae775ec87540acd7218fa990c40d1c94ab1)
+
+  As if synchronized via sleep:
+    #0 nanosleep ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:397 (libtsan.so.2+0x58cc6) (BuildId: 38097064631f7912bd33117a9c83d08b42e15571)
+    #1 void std::this_thread::sleep_for<long, std::ratio<1l, 1000l> >(std::chrono::duration<long, std::ratio<1l, 1000l> > const&) /usr/include/c++/13/bits/this_thread_sleep.h:80 (a.out+0x25a1) (BuildId: 7fce1dde4dba2ffb0f491f29ac99d16ffcf3bd67)
+    #2 main /home/anthony/repos/BosqueTests/testing/test.cpp:117 (a.out+0x25a1)
+
+  Location is TLS of main thread.
+
+  Mutex M0 (0x7f4713ebbf00) created at:
+    #0 pthread_mutex_lock ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1341 (libtsan.so.2+0x59a13) (BuildId: 38097064631f7912bd33117a9c83d08b42e15571)
+    #1 __gthread_mutex_lock /usr/include/x86_64-linux-gnu/c++/13/bits/gthr-default.h:749 (a.out+0x35a7) (BuildId: 7fce1dde4dba2ffb0f491f29ac99d16ffcf3bd67)
+    #2 std::mutex::lock() /usr/include/c++/13/bits/std_mutex.h:113 (a.out+0x35a7)
+    #3 std::unique_lock<std::mutex>::lock() /usr/include/c++/13/bits/unique_lock.h:141 (a.out+0x35a7)
+    #4 std::unique_lock<std::mutex>::unique_lock(std::mutex&) /usr/include/c++/13/bits/unique_lock.h:71 (a.out+0x35a7)
+    #5 DecsProcessor::process() /home/anthony/repos/BosqueTests/testing/test.cpp:88 (a.out+0x35a7)
+    #6 DecsProcessor::init()::{lambda()#1}::operator()() const /home/anthony/repos/BosqueTests/testing/test.cpp:39 (a.out+0x35a7)
+    #7 void std::__invoke_impl<void, DecsProcessor::init()::{lambda()#1}>(std::__invoke_other, DecsProcessor::init()::{lambda()#1}&&) /usr/include/c++/13/bits/invoke.h:61 (a.out+0x35a7)
+    #8 std::__invoke_result<DecsProcessor::init()::{lambda()#1}>::type std::__invoke<DecsProcessor::init()::{lambda()#1}>(DecsProcessor::init()::{lambda()#1}&&) /usr/include/c++/13/bits/invoke.h:96 (a.out+0x35a7)
+    #9 void std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> >::_M_invoke<0ul>(std::_Index_tuple<0ul>) /usr/include/c++/13/bits/std_thread.h:292 (a.out+0x35a7)
+    #10 std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> >::operator()() /usr/include/c++/13/bits/std_thread.h:299 (a.out+0x35a7)
+    #11 std::thread::_State_impl<std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> > >::_M_run() /usr/include/c++/13/bits/std_thread.h:244 (a.out+0x35a7)
+    #12 <null> <null> (libstdc++.so.6+0xecdb3) (BuildId: ca77dae775ec87540acd7218fa990c40d1c94ab1)
+
+  Thread T1 (tid=33192, running) created by main thread at:
+    #0 pthread_create ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1022 (libtsan.so.2+0x5ac1a) (BuildId: 38097064631f7912bd33117a9c83d08b42e15571)
+    #1 std::thread::_M_start_thread(std::unique_ptr<std::thread::_State, std::default_delete<std::thread::_State> >, void (*)()) <null> (libstdc++.so.6+0xeceb0) (BuildId: ca77dae775ec87540acd7218fa990c40d1c94ab1)
+    #2 main /home/anthony/repos/BosqueTests/testing/test.cpp:114 (a.out+0x2547) (BuildId: 7fce1dde4dba2ffb0f491f29ac99d16ffcf3bd67)
+
+SUMMARY: ThreadSanitizer: data race /home/anthony/repos/BosqueTests/testing/test.cpp:68 in DecsProcessor::resume()
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=33190)
+  Read of size 8 at 0x7f4713ebbf70 by thread T1 (mutexes: write M0):
+    #0 std::__cxx11::_List_base<int, std::allocator<int> >::_M_dec_size(unsigned long) /usr/include/c++/13/bits/stl_list.h:486 (a.out+0x3627) (BuildId: 7fce1dde4dba2ffb0f491f29ac99d16ffcf3bd67)
+    #1 std::__cxx11::list<int, std::allocator<int> >::_M_erase(std::_List_iterator<int>) /usr/include/c++/13/bits/stl_list.h:2015 (a.out+0x3627)
+    #2 std::__cxx11::list<int, std::allocator<int> >::pop_front() /usr/include/c++/13/bits/stl_list.h:1292 (a.out+0x3627)
+    #3 DecsProcessor::process() /home/anthony/repos/BosqueTests/testing/test.cpp:101 (a.out+0x3627)
+    #4 DecsProcessor::init()::{lambda()#1}::operator()() const /home/anthony/repos/BosqueTests/testing/test.cpp:39 (a.out+0x3627)
+    #5 void std::__invoke_impl<void, DecsProcessor::init()::{lambda()#1}>(std::__invoke_other, DecsProcessor::init()::{lambda()#1}&&) /usr/include/c++/13/bits/invoke.h:61 (a.out+0x3627)
+    #6 std::__invoke_result<DecsProcessor::init()::{lambda()#1}>::type std::__invoke<DecsProcessor::init()::{lambda()#1}>(DecsProcessor::init()::{lambda()#1}&&) /usr/include/c++/13/bits/invoke.h:96 (a.out+0x3627)
+    #7 void std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> >::_M_invoke<0ul>(std::_Index_tuple<0ul>) /usr/include/c++/13/bits/std_thread.h:292 (a.out+0x3627)
+    #8 std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> >::operator()() /usr/include/c++/13/bits/std_thread.h:299 (a.out+0x3627)
+    #9 std::thread::_State_impl<std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> > >::_M_run() /usr/include/c++/13/bits/std_thread.h:244 (a.out+0x3627)
+    #10 <null> <null> (libstdc++.so.6+0xecdb3) (BuildId: ca77dae775ec87540acd7218fa990c40d1c94ab1)
+
+  Previous write of size 8 at 0x7f4713ebbf70 by main thread:
+    #0 std::__cxx11::_List_base<int, std::allocator<int> >::_M_inc_size(unsigned long) /usr/include/c++/13/bits/stl_list.h:484 (a.out+0x26f6) (BuildId: 7fce1dde4dba2ffb0f491f29ac99d16ffcf3bd67)
+    #1 void std::__cxx11::list<int, std::allocator<int> >::_M_insert<int const&>(std::_List_iterator<int>, int const&) /usr/include/c++/13/bits/stl_list.h:2007 (a.out+0x26f6)
+    #2 std::__cxx11::list<int, std::allocator<int> >::push_back(int const&) /usr/include/c++/13/bits/stl_list.h:1306 (a.out+0x26f6)
+    #3 main /home/anthony/repos/BosqueTests/testing/test.cpp:125 (a.out+0x26f6)
+
+  Location is TLS of main thread.
+
+  Mutex M0 (0x7f4713ebbf00) created at:
+    #0 pthread_mutex_lock ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1341 (libtsan.so.2+0x59a13) (BuildId: 38097064631f7912bd33117a9c83d08b42e15571)
+    #1 __gthread_mutex_lock /usr/include/x86_64-linux-gnu/c++/13/bits/gthr-default.h:749 (a.out+0x35a7) (BuildId: 7fce1dde4dba2ffb0f491f29ac99d16ffcf3bd67)
+    #2 std::mutex::lock() /usr/include/c++/13/bits/std_mutex.h:113 (a.out+0x35a7)
+    #3 std::unique_lock<std::mutex>::lock() /usr/include/c++/13/bits/unique_lock.h:141 (a.out+0x35a7)
+    #4 std::unique_lock<std::mutex>::unique_lock(std::mutex&) /usr/include/c++/13/bits/unique_lock.h:71 (a.out+0x35a7)
+    #5 DecsProcessor::process() /home/anthony/repos/BosqueTests/testing/test.cpp:88 (a.out+0x35a7)
+    #6 DecsProcessor::init()::{lambda()#1}::operator()() const /home/anthony/repos/BosqueTests/testing/test.cpp:39 (a.out+0x35a7)
+    #7 void std::__invoke_impl<void, DecsProcessor::init()::{lambda()#1}>(std::__invoke_other, DecsProcessor::init()::{lambda()#1}&&) /usr/include/c++/13/bits/invoke.h:61 (a.out+0x35a7)
+    #8 std::__invoke_result<DecsProcessor::init()::{lambda()#1}>::type std::__invoke<DecsProcessor::init()::{lambda()#1}>(DecsProcessor::init()::{lambda()#1}&&) /usr/include/c++/13/bits/invoke.h:96 (a.out+0x35a7)
+    #9 void std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> >::_M_invoke<0ul>(std::_Index_tuple<0ul>) /usr/include/c++/13/bits/std_thread.h:292 (a.out+0x35a7)
+    #10 std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> >::operator()() /usr/include/c++/13/bits/std_thread.h:299 (a.out+0x35a7)
+    #11 std::thread::_State_impl<std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> > >::_M_run() /usr/include/c++/13/bits/std_thread.h:244 (a.out+0x35a7)
+    #12 <null> <null> (libstdc++.so.6+0xecdb3) (BuildId: ca77dae775ec87540acd7218fa990c40d1c94ab1)
+
+  Thread T1 (tid=33192, running) created by main thread at:
+    #0 pthread_create ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1022 (libtsan.so.2+0x5ac1a) (BuildId: 38097064631f7912bd33117a9c83d08b42e15571)
+    #1 std::thread::_M_start_thread(std::unique_ptr<std::thread::_State, std::default_delete<std::thread::_State> >, void (*)()) <null> (libstdc++.so.6+0xeceb0) (BuildId: ca77dae775ec87540acd7218fa990c40d1c94ab1)
+    #2 main /home/anthony/repos/BosqueTests/testing/test.cpp:114 (a.out+0x2547) (BuildId: 7fce1dde4dba2ffb0f491f29ac99d16ffcf3bd67)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/13/bits/stl_list.h:486 in std::__cxx11::_List_base<int, std::allocator<int> >::_M_dec_size(unsigned long)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=33190)
+  Write of size 8 at 0x720800028140 by thread T1 (mutexes: write M0):
+    #0 operator delete(void*, unsigned long) ../../../../src/libsanitizer/tsan/tsan_new_delete.cpp:150 (libtsan.so.2+0xa66c8) (BuildId: 38097064631f7912bd33117a9c83d08b42e15571)
+    #1 std::__new_allocator<std::_List_node<int> >::deallocate(std::_List_node<int>*, unsigned long) /usr/include/c++/13/bits/new_allocator.h:172 (a.out+0x3650) (BuildId: 7fce1dde4dba2ffb0f491f29ac99d16ffcf3bd67)
+    #2 std::allocator_traits<std::allocator<std::_List_node<int> > >::deallocate(std::allocator<std::_List_node<int> >&, std::_List_node<int>*, unsigned long) /usr/include/c++/13/bits/alloc_traits.h:517 (a.out+0x3650)
+    #3 std::__cxx11::_List_base<int, std::allocator<int> >::_M_put_node(std::_List_node<int>*) /usr/include/c++/13/bits/stl_list.h:522 (a.out+0x3650)
+    #4 std::__cxx11::list<int, std::allocator<int> >::_M_erase(std::_List_iterator<int>) /usr/include/c++/13/bits/stl_list.h:2024 (a.out+0x3650)
+    #5 std::__cxx11::list<int, std::allocator<int> >::pop_front() /usr/include/c++/13/bits/stl_list.h:1292 (a.out+0x3650)
+    #6 DecsProcessor::process() /home/anthony/repos/BosqueTests/testing/test.cpp:101 (a.out+0x3650)
+    #7 DecsProcessor::init()::{lambda()#1}::operator()() const /home/anthony/repos/BosqueTests/testing/test.cpp:39 (a.out+0x3650)
+    #8 void std::__invoke_impl<void, DecsProcessor::init()::{lambda()#1}>(std::__invoke_other, DecsProcessor::init()::{lambda()#1}&&) /usr/include/c++/13/bits/invoke.h:61 (a.out+0x3650)
+    #9 std::__invoke_result<DecsProcessor::init()::{lambda()#1}>::type std::__invoke<DecsProcessor::init()::{lambda()#1}>(DecsProcessor::init()::{lambda()#1}&&) /usr/include/c++/13/bits/invoke.h:96 (a.out+0x3650)
+    #10 void std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> >::_M_invoke<0ul>(std::_Index_tuple<0ul>) /usr/include/c++/13/bits/std_thread.h:292 (a.out+0x3650)
+    #11 std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> >::operator()() /usr/include/c++/13/bits/std_thread.h:299 (a.out+0x3650)
+    #12 std::thread::_State_impl<std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> > >::_M_run() /usr/include/c++/13/bits/std_thread.h:244 (a.out+0x3650)
+    #13 <null> <null> (libstdc++.so.6+0xecdb3) (BuildId: ca77dae775ec87540acd7218fa990c40d1c94ab1)
+
+  Previous write of size 8 at 0x720800028140 by main thread:
+    #0 operator new(unsigned long) ../../../../src/libsanitizer/tsan/tsan_new_delete.cpp:64 (libtsan.so.2+0xa6fae) (BuildId: 38097064631f7912bd33117a9c83d08b42e15571)
+    #1 std::__new_allocator<std::_List_node<int> >::allocate(unsigned long, void const*) /usr/include/c++/13/bits/new_allocator.h:151 (a.out+0x26b9) (BuildId: 7fce1dde4dba2ffb0f491f29ac99d16ffcf3bd67)
+    #2 std::allocator_traits<std::allocator<std::_List_node<int> > >::allocate(std::allocator<std::_List_node<int> >&, unsigned long) /usr/include/c++/13/bits/alloc_traits.h:482 (a.out+0x26b9)
+    #3 std::__cxx11::_List_base<int, std::allocator<int> >::_M_get_node() /usr/include/c++/13/bits/stl_list.h:518 (a.out+0x26b9)
+    #4 std::_List_node<int>* std::__cxx11::list<int, std::allocator<int> >::_M_create_node<int const&>(int const&) /usr/include/c++/13/bits/stl_list.h:710 (a.out+0x26b9)
+    #5 void std::__cxx11::list<int, std::allocator<int> >::_M_insert<int const&>(std::_List_iterator<int>, int const&) /usr/include/c++/13/bits/stl_list.h:2005 (a.out+0x26b9)
+    #6 std::__cxx11::list<int, std::allocator<int> >::push_back(int const&) /usr/include/c++/13/bits/stl_list.h:1306 (a.out+0x26b9)
+    #7 main /home/anthony/repos/BosqueTests/testing/test.cpp:125 (a.out+0x26b9)
+
+  Mutex M0 (0x7f4713ebbf00) created at:
+    #0 pthread_mutex_lock ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1341 (libtsan.so.2+0x59a13) (BuildId: 38097064631f7912bd33117a9c83d08b42e15571)
+    #1 __gthread_mutex_lock /usr/include/x86_64-linux-gnu/c++/13/bits/gthr-default.h:749 (a.out+0x35a7) (BuildId: 7fce1dde4dba2ffb0f491f29ac99d16ffcf3bd67)
+    #2 std::mutex::lock() /usr/include/c++/13/bits/std_mutex.h:113 (a.out+0x35a7)
+    #3 std::unique_lock<std::mutex>::lock() /usr/include/c++/13/bits/unique_lock.h:141 (a.out+0x35a7)
+    #4 std::unique_lock<std::mutex>::unique_lock(std::mutex&) /usr/include/c++/13/bits/unique_lock.h:71 (a.out+0x35a7)
+    #5 DecsProcessor::process() /home/anthony/repos/BosqueTests/testing/test.cpp:88 (a.out+0x35a7)
+    #6 DecsProcessor::init()::{lambda()#1}::operator()() const /home/anthony/repos/BosqueTests/testing/test.cpp:39 (a.out+0x35a7)
+    #7 void std::__invoke_impl<void, DecsProcessor::init()::{lambda()#1}>(std::__invoke_other, DecsProcessor::init()::{lambda()#1}&&) /usr/include/c++/13/bits/invoke.h:61 (a.out+0x35a7)
+    #8 std::__invoke_result<DecsProcessor::init()::{lambda()#1}>::type std::__invoke<DecsProcessor::init()::{lambda()#1}>(DecsProcessor::init()::{lambda()#1}&&) /usr/include/c++/13/bits/invoke.h:96 (a.out+0x35a7)
+    #9 void std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> >::_M_invoke<0ul>(std::_Index_tuple<0ul>) /usr/include/c++/13/bits/std_thread.h:292 (a.out+0x35a7)
+    #10 std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> >::operator()() /usr/include/c++/13/bits/std_thread.h:299 (a.out+0x35a7)
+    #11 std::thread::_State_impl<std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> > >::_M_run() /usr/include/c++/13/bits/std_thread.h:244 (a.out+0x35a7)
+    #12 <null> <null> (libstdc++.so.6+0xecdb3) (BuildId: ca77dae775ec87540acd7218fa990c40d1c94ab1)
+
+  Thread T1 (tid=33192, running) created by main thread at:
+    #0 pthread_create ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1022 (libtsan.so.2+0x5ac1a) (BuildId: 38097064631f7912bd33117a9c83d08b42e15571)
+    #1 std::thread::_M_start_thread(std::unique_ptr<std::thread::_State, std::default_delete<std::thread::_State> >, void (*)()) <null> (libstdc++.so.6+0xeceb0) (BuildId: ca77dae775ec87540acd7218fa990c40d1c94ab1)
+    #2 main /home/anthony/repos/BosqueTests/testing/test.cpp:114 (a.out+0x2547) (BuildId: 7fce1dde4dba2ffb0f491f29ac99d16ffcf3bd67)
+
+SUMMARY: ThreadSanitizer: data race ../../../../src/libsanitizer/tsan/tsan_new_delete.cpp:150 in operator delete(void*, unsigned long)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=33190)
+  Write of size 4 at 0x7f4713ebbf78 by thread T1 (mutexes: write M0):
+    #0 DecsProcessor::changeStateFromWorker(DecsProcessor::State, std::unique_lock<std::mutex>&) /home/anthony/repos/BosqueTests/testing/test.cpp:53 (a.out+0x3678) (BuildId: 7fce1dde4dba2ffb0f491f29ac99d16ffcf3bd67)
+    #1 DecsProcessor::process() /home/anthony/repos/BosqueTests/testing/test.cpp:104 (a.out+0x3678)
+    #2 DecsProcessor::init()::{lambda()#1}::operator()() const /home/anthony/repos/BosqueTests/testing/test.cpp:39 (a.out+0x3678)
+    #3 void std::__invoke_impl<void, DecsProcessor::init()::{lambda()#1}>(std::__invoke_other, DecsProcessor::init()::{lambda()#1}&&) /usr/include/c++/13/bits/invoke.h:61 (a.out+0x3678)
+    #4 std::__invoke_result<DecsProcessor::init()::{lambda()#1}>::type std::__invoke<DecsProcessor::init()::{lambda()#1}>(DecsProcessor::init()::{lambda()#1}&&) /usr/include/c++/13/bits/invoke.h:96 (a.out+0x3678)
+    #5 void std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> >::_M_invoke<0ul>(std::_Index_tuple<0ul>) /usr/include/c++/13/bits/std_thread.h:292 (a.out+0x3678)
+    #6 std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> >::operator()() /usr/include/c++/13/bits/std_thread.h:299 (a.out+0x3678)
+    #7 std::thread::_State_impl<std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> > >::_M_run() /usr/include/c++/13/bits/std_thread.h:244 (a.out+0x3678)
+    #8 <null> <null> (libstdc++.so.6+0xecdb3) (BuildId: ca77dae775ec87540acd7218fa990c40d1c94ab1)
+
+  Previous write of size 4 at 0x7f4713ebbf78 by main thread:
+    #0 DecsProcessor::changeStateFromMain(DecsProcessor::State, DecsProcessor::State) /home/anthony/repos/BosqueTests/testing/test.cpp:45 (a.out+0x2601) (BuildId: 7fce1dde4dba2ffb0f491f29ac99d16ffcf3bd67)
+    #1 DecsProcessor::pause() /home/anthony/repos/BosqueTests/testing/test.cpp:63 (a.out+0x2601)
+    #2 main /home/anthony/repos/BosqueTests/testing/test.cpp:120 (a.out+0x2601)
+
+  Location is TLS of main thread.
+
+  Mutex M0 (0x7f4713ebbf00) created at:
+    #0 pthread_mutex_lock ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1341 (libtsan.so.2+0x59a13) (BuildId: 38097064631f7912bd33117a9c83d08b42e15571)
+    #1 __gthread_mutex_lock /usr/include/x86_64-linux-gnu/c++/13/bits/gthr-default.h:749 (a.out+0x35a7) (BuildId: 7fce1dde4dba2ffb0f491f29ac99d16ffcf3bd67)
+    #2 std::mutex::lock() /usr/include/c++/13/bits/std_mutex.h:113 (a.out+0x35a7)
+    #3 std::unique_lock<std::mutex>::lock() /usr/include/c++/13/bits/unique_lock.h:141 (a.out+0x35a7)
+    #4 std::unique_lock<std::mutex>::unique_lock(std::mutex&) /usr/include/c++/13/bits/unique_lock.h:71 (a.out+0x35a7)
+    #5 DecsProcessor::process() /home/anthony/repos/BosqueTests/testing/test.cpp:88 (a.out+0x35a7)
+    #6 DecsProcessor::init()::{lambda()#1}::operator()() const /home/anthony/repos/BosqueTests/testing/test.cpp:39 (a.out+0x35a7)
+    #7 void std::__invoke_impl<void, DecsProcessor::init()::{lambda()#1}>(std::__invoke_other, DecsProcessor::init()::{lambda()#1}&&) /usr/include/c++/13/bits/invoke.h:61 (a.out+0x35a7)
+    #8 std::__invoke_result<DecsProcessor::init()::{lambda()#1}>::type std::__invoke<DecsProcessor::init()::{lambda()#1}>(DecsProcessor::init()::{lambda()#1}&&) /usr/include/c++/13/bits/invoke.h:96 (a.out+0x35a7)
+    #9 void std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> >::_M_invoke<0ul>(std::_Index_tuple<0ul>) /usr/include/c++/13/bits/std_thread.h:292 (a.out+0x35a7)
+    #10 std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> >::operator()() /usr/include/c++/13/bits/std_thread.h:299 (a.out+0x35a7)
+    #11 std::thread::_State_impl<std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> > >::_M_run() /usr/include/c++/13/bits/std_thread.h:244 (a.out+0x35a7)
+    #12 <null> <null> (libstdc++.so.6+0xecdb3) (BuildId: ca77dae775ec87540acd7218fa990c40d1c94ab1)
+
+  Thread T1 (tid=33192, running) created by main thread at:
+    #0 pthread_create ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1022 (libtsan.so.2+0x5ac1a) (BuildId: 38097064631f7912bd33117a9c83d08b42e15571)
+    #1 std::thread::_M_start_thread(std::unique_ptr<std::thread::_State, std::default_delete<std::thread::_State> >, void (*)()) <null> (libstdc++.so.6+0xeceb0) (BuildId: ca77dae775ec87540acd7218fa990c40d1c94ab1)
+    #2 main /home/anthony/repos/BosqueTests/testing/test.cpp:114 (a.out+0x2547) (BuildId: 7fce1dde4dba2ffb0f491f29ac99d16ffcf3bd67)
+
+SUMMARY: ThreadSanitizer: data race /home/anthony/repos/BosqueTests/testing/test.cpp:53 in DecsProcessor::changeStateFromWorker(DecsProcessor::State, std::unique_lock<std::mutex>&)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=33190)
+  Write of size 8 at 0x7f4713ebbf70 by thread T1 (mutexes: write M0):
+    #0 std::__cxx11::_List_base<int, std::allocator<int> >::_M_dec_size(unsigned long) /usr/include/c++/13/bits/stl_list.h:486 (a.out+0x3637) (BuildId: 7fce1dde4dba2ffb0f491f29ac99d16ffcf3bd67)
+    #1 std::__cxx11::list<int, std::allocator<int> >::_M_erase(std::_List_iterator<int>) /usr/include/c++/13/bits/stl_list.h:2015 (a.out+0x3637)
+    #2 std::__cxx11::list<int, std::allocator<int> >::pop_front() /usr/include/c++/13/bits/stl_list.h:1292 (a.out+0x3637)
+    #3 DecsProcessor::process() /home/anthony/repos/BosqueTests/testing/test.cpp:101 (a.out+0x3637)
+    #4 DecsProcessor::init()::{lambda()#1}::operator()() const /home/anthony/repos/BosqueTests/testing/test.cpp:39 (a.out+0x3637)
+    #5 void std::__invoke_impl<void, DecsProcessor::init()::{lambda()#1}>(std::__invoke_other, DecsProcessor::init()::{lambda()#1}&&) /usr/include/c++/13/bits/invoke.h:61 (a.out+0x3637)
+    #6 std::__invoke_result<DecsProcessor::init()::{lambda()#1}>::type std::__invoke<DecsProcessor::init()::{lambda()#1}>(DecsProcessor::init()::{lambda()#1}&&) /usr/include/c++/13/bits/invoke.h:96 (a.out+0x3637)
+    #7 void std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> >::_M_invoke<0ul>(std::_Index_tuple<0ul>) /usr/include/c++/13/bits/std_thread.h:292 (a.out+0x3637)
+    #8 std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> >::operator()() /usr/include/c++/13/bits/std_thread.h:299 (a.out+0x3637)
+    #9 std::thread::_State_impl<std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> > >::_M_run() /usr/include/c++/13/bits/std_thread.h:244 (a.out+0x3637)
+    #10 <null> <null> (libstdc++.so.6+0xecdb3) (BuildId: ca77dae775ec87540acd7218fa990c40d1c94ab1)
+
+  Previous write of size 8 at 0x7f4713ebbf70 by main thread:
+    #0 std::__cxx11::_List_base<int, std::allocator<int> >::_M_inc_size(unsigned long) /usr/include/c++/13/bits/stl_list.h:484 (a.out+0x26f6) (BuildId: 7fce1dde4dba2ffb0f491f29ac99d16ffcf3bd67)
+    #1 void std::__cxx11::list<int, std::allocator<int> >::_M_insert<int const&>(std::_List_iterator<int>, int const&) /usr/include/c++/13/bits/stl_list.h:2007 (a.out+0x26f6)
+    #2 std::__cxx11::list<int, std::allocator<int> >::push_back(int const&) /usr/include/c++/13/bits/stl_list.h:1306 (a.out+0x26f6)
+    #3 main /home/anthony/repos/BosqueTests/testing/test.cpp:125 (a.out+0x26f6)
+
+  Location is TLS of main thread.
+
+  Mutex M0 (0x7f4713ebbf00) created at:
+    #0 pthread_mutex_lock ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1341 (libtsan.so.2+0x59a13) (BuildId: 38097064631f7912bd33117a9c83d08b42e15571)
+    #1 __gthread_mutex_lock /usr/include/x86_64-linux-gnu/c++/13/bits/gthr-default.h:749 (a.out+0x35a7) (BuildId: 7fce1dde4dba2ffb0f491f29ac99d16ffcf3bd67)
+    #2 std::mutex::lock() /usr/include/c++/13/bits/std_mutex.h:113 (a.out+0x35a7)
+    #3 std::unique_lock<std::mutex>::lock() /usr/include/c++/13/bits/unique_lock.h:141 (a.out+0x35a7)
+    #4 std::unique_lock<std::mutex>::unique_lock(std::mutex&) /usr/include/c++/13/bits/unique_lock.h:71 (a.out+0x35a7)
+    #5 DecsProcessor::process() /home/anthony/repos/BosqueTests/testing/test.cpp:88 (a.out+0x35a7)
+    #6 DecsProcessor::init()::{lambda()#1}::operator()() const /home/anthony/repos/BosqueTests/testing/test.cpp:39 (a.out+0x35a7)
+    #7 void std::__invoke_impl<void, DecsProcessor::init()::{lambda()#1}>(std::__invoke_other, DecsProcessor::init()::{lambda()#1}&&) /usr/include/c++/13/bits/invoke.h:61 (a.out+0x35a7)
+    #8 std::__invoke_result<DecsProcessor::init()::{lambda()#1}>::type std::__invoke<DecsProcessor::init()::{lambda()#1}>(DecsProcessor::init()::{lambda()#1}&&) /usr/include/c++/13/bits/invoke.h:96 (a.out+0x35a7)
+    #9 void std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> >::_M_invoke<0ul>(std::_Index_tuple<0ul>) /usr/include/c++/13/bits/std_thread.h:292 (a.out+0x35a7)
+    #10 std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> >::operator()() /usr/include/c++/13/bits/std_thread.h:299 (a.out+0x35a7)
+    #11 std::thread::_State_impl<std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> > >::_M_run() /usr/include/c++/13/bits/std_thread.h:244 (a.out+0x35a7)
+    #12 <null> <null> (libstdc++.so.6+0xecdb3) (BuildId: ca77dae775ec87540acd7218fa990c40d1c94ab1)
+
+  Thread T1 (tid=33192, running) created by main thread at:
+    #0 pthread_create ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1022 (libtsan.so.2+0x5ac1a) (BuildId: 38097064631f7912bd33117a9c83d08b42e15571)
+    #1 std::thread::_M_start_thread(std::unique_ptr<std::thread::_State, std::default_delete<std::thread::_State> >, void (*)()) <null> (libstdc++.so.6+0xeceb0) (BuildId: ca77dae775ec87540acd7218fa990c40d1c94ab1)
+    #2 main /home/anthony/repos/BosqueTests/testing/test.cpp:114 (a.out+0x2547) (BuildId: 7fce1dde4dba2ffb0f491f29ac99d16ffcf3bd67)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/13/bits/stl_list.h:486 in std::__cxx11::_List_base<int, std::allocator<int> >::_M_dec_size(unsigned long)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=33190)
+  Write of size 4 at 0x7f4713ebbf78 by thread T1 (mutexes: write M0):
+    #0 DecsProcessor::changeStateFromWorker(DecsProcessor::State, std::unique_lock<std::mutex>&) /home/anthony/repos/BosqueTests/testing/test.cpp:53 (a.out+0x3678) (BuildId: 7fce1dde4dba2ffb0f491f29ac99d16ffcf3bd67)
+    #1 DecsProcessor::process() /home/anthony/repos/BosqueTests/testing/test.cpp:104 (a.out+0x3678)
+    #2 DecsProcessor::init()::{lambda()#1}::operator()() const /home/anthony/repos/BosqueTests/testing/test.cpp:39 (a.out+0x3678)
+    #3 void std::__invoke_impl<void, DecsProcessor::init()::{lambda()#1}>(std::__invoke_other, DecsProcessor::init()::{lambda()#1}&&) /usr/include/c++/13/bits/invoke.h:61 (a.out+0x3678)
+    #4 std::__invoke_result<DecsProcessor::init()::{lambda()#1}>::type std::__invoke<DecsProcessor::init()::{lambda()#1}>(DecsProcessor::init()::{lambda()#1}&&) /usr/include/c++/13/bits/invoke.h:96 (a.out+0x3678)
+    #5 void std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> >::_M_invoke<0ul>(std::_Index_tuple<0ul>) /usr/include/c++/13/bits/std_thread.h:292 (a.out+0x3678)
+    #6 std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> >::operator()() /usr/include/c++/13/bits/std_thread.h:299 (a.out+0x3678)
+    #7 std::thread::_State_impl<std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> > >::_M_run() /usr/include/c++/13/bits/std_thread.h:244 (a.out+0x3678)
+    #8 <null> <null> (libstdc++.so.6+0xecdb3) (BuildId: ca77dae775ec87540acd7218fa990c40d1c94ab1)
+
+  Previous write of size 4 at 0x7f4713ebbf78 by main thread:
+    #0 DecsProcessor::resume() /home/anthony/repos/BosqueTests/testing/test.cpp:68 (a.out+0x297c) (BuildId: 7fce1dde4dba2ffb0f491f29ac99d16ffcf3bd67)
+    #1 main /home/anthony/repos/BosqueTests/testing/test.cpp:131 (a.out+0x297c)
+
+  Location is TLS of main thread.
+
+  Mutex M0 (0x7f4713ebbf00) created at:
+    #0 pthread_mutex_lock ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1341 (libtsan.so.2+0x59a13) (BuildId: 38097064631f7912bd33117a9c83d08b42e15571)
+    #1 __gthread_mutex_lock /usr/include/x86_64-linux-gnu/c++/13/bits/gthr-default.h:749 (a.out+0x35a7) (BuildId: 7fce1dde4dba2ffb0f491f29ac99d16ffcf3bd67)
+    #2 std::mutex::lock() /usr/include/c++/13/bits/std_mutex.h:113 (a.out+0x35a7)
+    #3 std::unique_lock<std::mutex>::lock() /usr/include/c++/13/bits/unique_lock.h:141 (a.out+0x35a7)
+    #4 std::unique_lock<std::mutex>::unique_lock(std::mutex&) /usr/include/c++/13/bits/unique_lock.h:71 (a.out+0x35a7)
+    #5 DecsProcessor::process() /home/anthony/repos/BosqueTests/testing/test.cpp:88 (a.out+0x35a7)
+    #6 DecsProcessor::init()::{lambda()#1}::operator()() const /home/anthony/repos/BosqueTests/testing/test.cpp:39 (a.out+0x35a7)
+    #7 void std::__invoke_impl<void, DecsProcessor::init()::{lambda()#1}>(std::__invoke_other, DecsProcessor::init()::{lambda()#1}&&) /usr/include/c++/13/bits/invoke.h:61 (a.out+0x35a7)
+    #8 std::__invoke_result<DecsProcessor::init()::{lambda()#1}>::type std::__invoke<DecsProcessor::init()::{lambda()#1}>(DecsProcessor::init()::{lambda()#1}&&) /usr/include/c++/13/bits/invoke.h:96 (a.out+0x35a7)
+    #9 void std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> >::_M_invoke<0ul>(std::_Index_tuple<0ul>) /usr/include/c++/13/bits/std_thread.h:292 (a.out+0x35a7)
+    #10 std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> >::operator()() /usr/include/c++/13/bits/std_thread.h:299 (a.out+0x35a7)
+    #11 std::thread::_State_impl<std::thread::_Invoker<std::tuple<DecsProcessor::init()::{lambda()#1}> > >::_M_run() /usr/include/c++/13/bits/std_thread.h:244 (a.out+0x35a7)
+    #12 <null> <null> (libstdc++.so.6+0xecdb3) (BuildId: ca77dae775ec87540acd7218fa990c40d1c94ab1)
+
+  Thread T1 (tid=33192, running) created by main thread at:
+    #0 pthread_create ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1022 (libtsan.so.2+0x5ac1a) (BuildId: 38097064631f7912bd33117a9c83d08b42e15571)
+    #1 std::thread::_M_start_thread(std::unique_ptr<std::thread::_State, std::default_delete<std::thread::_State> >, void (*)()) <null> (libstdc++.so.6+0xeceb0) (BuildId: ca77dae775ec87540acd7218fa990c40d1c94ab1)
+    #2 main /home/anthony/repos/BosqueTests/testing/test.cpp:114 (a.out+0x2547) (BuildId: 7fce1dde4dba2ffb0f491f29ac99d16ffcf3bd67)
+
+SUMMARY: ThreadSanitizer: data race /home/anthony/repos/BosqueTests/testing/test.cpp:53 in DecsProcessor::changeStateFromWorker(DecsProcessor::State, std::unique_lock<std::mutex>&)
+==================
+ThreadSanitizer: reported 6 warnings
