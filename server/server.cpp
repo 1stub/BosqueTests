@@ -27,7 +27,7 @@
     //
     // Now these can change!
     //
-    constexpr size_t DEFAULT_WORKLIST_SIZE = 600ULL;
+    constexpr size_t DEFAULT_WORKLIST_SIZE = 25ULL;
 
     constexpr size_t NBODY_WORKLIST_SIZE = DEFAULT_WORKLIST_SIZE;
     constexpr size_t MIN_NBODY_STEPS = 50'500UL;
@@ -123,7 +123,7 @@
     
         std::cout << "db time: " << timer.get_duration_ms() / 1000 << " seconds" << std::endl;
         std::cout << "db memstats: " << std::endl;
-        MEM_STATS_DUMP(gtl_info);
+        MEM_STATS_DUMP();
     }
 
     std::vector<std::vector<std::pair<size_t, size_t>>> raytraceworklist_create(std::mt19937& gen) {
@@ -192,7 +192,7 @@
     
         std::cout << "raytrace time: " << timer.get_duration_ms() / 1000 << " seconds" << std::endl;
         std::cout << "raytrace memstats: " << std::endl;
-        MEM_STATS_DUMP(gtl_info);
+        MEM_STATS_DUMP();
     }
     
     std::vector<size_t> nbodyworklist_create(std::mt19937& gen) { 
@@ -229,7 +229,7 @@
     
         std::cout << "nbody time: " << timer.get_duration_ms() / 1000 << " seconds" << std::endl;
         std::cout << "nbody memstats: " << std::endl;
-        MEM_STATS_DUMP(gtl_info);
+        MEM_STATS_DUMP();
     }
 
     std::vector<MixedOp> mixedworklist_create(std::mt19937& gen) {        
@@ -273,12 +273,14 @@
     
         std::cout << "mixed time: " << timer.get_duration_ms() / 1000 << " seconds" << std::endl;
         std::cout << "mixed memstats: " << std::endl;
-        MEM_STATS_DUMP(gtl_info);
+        MEM_STATS_DUMP();
     }
 
     void calculate_and_print_timing_stats() {
         std::map<OpType, std::vector<double>> timings_by_type;
-        
+       
+        MEM_STATS_DUMP();
+
         for (const auto& timing : op_timings) {
             timings_by_type[timing.type].push_back(timing.time);
         }

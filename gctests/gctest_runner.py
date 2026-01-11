@@ -9,7 +9,7 @@ MAIN_NS = "namespace Main {"
 INCLUDE_HDR = "#include \"emit.hpp\""
 INCLUDE_HDR_RPL = INCLUDE_HDR + '\n' + "void* garray[15] = {};\n"
 EMAIN = "__CoreCpp::Bool main() noexcept  {"
-EMAIN_RPL = EMAIN + '\n' + "GlobalDataStorage::g_global_data.initialize(sizeof(garray), (void**)garray); gtl_info.disable_stack_refs_for_tests = true; gtl_info.enable_global_rescan = true;"
+EMAIN_RPL = EMAIN + '\n' + "\tGlobalDataStorage::g_global_data.initialize(sizeof(garray), (void**)garray); gtl_info.disable_stack_refs_for_tests = true; gtl_info.enable_global_rescan = true;"
 
 def cleanup(dir):
     if os.path.exists(dir):
