@@ -77,7 +77,7 @@ __CoreCpp::Nat main() noexcept  {
         }
     }
    
-    MEM_STATS_DUMP(gtl_info);
+    MEM_STATS_DUMP();
 
     return 0_n;
 }

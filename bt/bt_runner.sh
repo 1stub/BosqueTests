@@ -2,6 +2,7 @@
 
 # Make sure these directories are correctly set!
 cwd=$(pwd)
+#bosque=$cwd/../../../Downloads/BosqueCore_JUST_AFTER_GCPAPER
 bosque=$cwd/../../BosqueCore
 cpp=$bosque/bin/src/cmd/analyzecpp.js
 
