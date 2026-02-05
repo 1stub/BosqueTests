@@ -114,4 +114,4 @@ fi
 cd $cppout
 make clean
 make BUILD=$build
-./output/memex
+time ./output/memex

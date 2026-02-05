@@ -9,7 +9,9 @@ MAIN_NS = "namespace Main {"
 INCLUDE_HDR = "#include \"emit.hpp\""
 INCLUDE_HDR_RPL = INCLUDE_HDR + '\n' + "void* garray[15] = {};\n"
 EMAIN = "__CoreCpp::Bool main() noexcept  {"
-EMAIN_RPL = EMAIN + '\n' + "\tGlobalDataStorage::g_global_data.initialize(sizeof(garray), (void**)garray); gtl_info.disable_stack_refs_for_tests = true; gtl_info.enable_global_rescan = true;"
+EMAIN_RPL = EMAIN + '\n' + """\tGlobalDataStorage::g_global_data.initialize(sizeof(garray), (void**)garray);
+	\tg_disable_stack_refs = true;
+	\tg_thd_testing = true;"""
 
 def cleanup(dir):
     if os.path.exists(dir):
@@ -23,6 +25,11 @@ def insertTestCode(dir, code):
     emit = emit.replace(INCLUDE_HDR, INCLUDE_HDR_RPL)
     emit = emit.replace(EMAIN, EMAIN_RPL)
     open(emitpath, 'w').write(emit)
+
+# this might be wrong test naming, idea should be there
+def fail():
+	print(f"Unknown input program! Not {shared_}tree_basic/wide/subtree.bsq... arvg[1] = {src}")
+	sys.exit(1)
 
 def main():
     # Make sure these directories are correctly set!
@@ -39,14 +46,23 @@ def main():
     src = sys.argv[1]
 
     tests = None
-    if src.__contains__('basic'):
+    if src.__contains__('shared_'):
+        src = src.replace('shared_', '') 
+        if src.__contains__('basic'):
+            tests = open('shared_tree_basic.cpp', 'r').read()
+        elif src.__contains__('wide'):
+            tests = open('shared_tree_wide.cpp', 'r').read()
+        elif src._contains__('subtree'):
+            tests = open('shared_subtree.cpp', 'r').read()
+        else:
+            fail()
+    elif src.__contains__('basic'):
         tests = open('tree_basic.cpp', 'r').read()
     elif src.__contains__('wide'):
         tests = open('tree_wide.cpp', 'r').read()
     else:
-        print(f"Unknown input program! Not tree_basic/wide.bsq... arvg[1] = {src}")
-        sys.exit(1)
-
+        fail()	
+		
     cleanup(cppout)
 
     try:
@@ -65,7 +81,7 @@ def main():
         insertTestCode(cppout, tests)
 
         subprocess.run(["make", "clean"], check=False)
-        subprocess.run(["make"], check=True)
+        subprocess.run(["make", "BUILD=test"], check=True)
         
         memex_path = os.path.join("output", "memex")
         if not os.path.exists(memex_path):
