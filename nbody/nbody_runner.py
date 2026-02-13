@@ -48,7 +48,7 @@ def main():
 	if nargs == 2:
 		n_iterations = sys.argv[1]
 
-	assert(n_thds > 0)
+	assert(int(n_thds) > 0)
 
 	try:
 		subprocess.run(["node", cpp, src], check=True)
