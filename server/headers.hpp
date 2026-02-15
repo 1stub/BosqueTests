@@ -1,4 +1,6 @@
 #include "emit.hpp"
+#include <thread>
+#include <mutex>
 #include <vector>
 #include <random>
 #include <chrono>
