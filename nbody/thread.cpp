@@ -20,7 +20,7 @@ __CoreCpp::Float main() noexcept  {
 	size_t n = /*N_ITERATIONS*/;
 	for(size_t i = 0; i < nthds - 1; i++) {
 		thds[i] = std::thread([n]() {
-			gtl_info.initializeGC(allocs, sizeof(allocs) / sizeof(allocs[0]), collect);
+			gtl_info.initializeGC(allocs, sizeof(allocs) / sizeof(allocs[0]), false, collect);
 
 			__CoreCpp::Float res = run(n);
 

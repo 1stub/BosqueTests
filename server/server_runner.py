@@ -5,18 +5,18 @@ import sys
 import subprocess
 import shutil
 import re
+import operator as op
+from typing import Optional
 
-N_THREADS = "/*N_THREADS*/"
-MODE      = "/*MODE*/";    
-HEADER    = '#include "emit.hpp"'
+N_THREADS     = "/*N_THREADS*/"
+MODE          = "/*MODE*/";
+WORKLIST_SIZE = "/*WORKLIST_SIZE*/"
+HEADER        = '#include "emit.hpp"'
 
 #######################################
-# Syntax: 
-#     python3 server_runner.py BUILD_TYPE TEST_TYPE NUM_THREADS
-#
 # i.e.
-#     python3 server_runner.py mixed 2
-#     python3 server_runner.py db
+#     python3 server_runner.py test=mixed wrksz=180 nthds=2
+#     python3 server_runner.py test=db
 #
 
 def cleanup(dir):
@@ -24,16 +24,26 @@ def cleanup(dir):
         print("Deleting old cppout files!")
         shutil.rmtree(dir)
 
-def replace(dir, code, headers, mode, nthds):
+def replace(dir, code, headers, mode, wrksz, nthds):
 	emitpath = os.path.join(dir, "emit.cpp")
 	emit = open(emitpath, 'r').read()
 
 	emit = re.sub(r'__CoreCpp::[a-zA-Z]+ main\(\) noexcept  {[^}]*}', code, emit, 0)
 	emit = emit.replace(HEADER, headers)
-	emit = emit.replace(N_THREADS, str(nthds))
 	emit = emit.replace(MODE,'"' + mode + '"')
-
+	emit = emit.replace(WORKLIST_SIZE, str(wrksz))
+	emit = emit.replace(N_THREADS, str(nthds))
+	
 	open(emitpath, 'w').write(emit)
+
+def parse_argv(trgt) -> Optional[str]:
+	for arg in sys.argv:
+		if not op.contains(arg, trgt):
+			continue
+
+		return arg.removeprefix(trgt)
+
+	return None 
 
 def main():
 	# Make sure these directories are correctly set!
@@ -43,24 +53,29 @@ def main():
 	cppout = os.path.join(cwd, "cppout")
 	src = os.path.join(cwd, "server.bsq")	
 	testtype = "mixed"
+	worklist_size = 600
 	n_thds = 1
 
 	# Cleanup any leftover cpp code 
 	cleanup(cppout)
 
 	nargs = len(sys.argv)
-	if nargs > 3:
-		print(f"Found {nargs} args when max is 2!")
+	if nargs > 4:
+		print(f"Found {nargs} args when max is 3!")
 		sys.exit(1)
 
-	if nargs == 3:
-		n_thds = sys.argv[2]
-		nargs -= 1
+	if parse := parse_argv("test="):
+		testtype = parse
 
-	if nargs == 2:
-		testtype = sys.argv[1]
+	if parse := parse_argv("wrksz="):
+		worklist_size = parse
+
+	if parse := parse_argv("nthds="):
+		n_thds = parse
 
 	assert(int(n_thds) > 0)
+
+	print(f"""Running server benchmark in mode {testtype} with a worklist of size {worklist_size} and doing so on {n_thds} threads""")
 
 	try:
 		subprocess.run(["node", cpp, src], check=True)
@@ -83,12 +98,11 @@ def main():
 		test_code = open(test_path, 'r').read()
 
 		os.chdir(cppout)
-		replace(cppout, test_code, headers_code, testtype, n_thds)
+		replace(cppout, test_code, headers_code, testtype, worklist_size, n_thds)
 
-		# For now default is release, may want to allow for dev or a no
-		# memstats mode?
+		# Our default build will be release with memstats on
 		subprocess.run(["make", "clean"], check=False)
-		subprocess.run(["make", "BUILD=release"], check=True)
+		subprocess.run(["make", "BUILD=release", "OPTIONS=-DMEM_STATS"], check=True)
         
 		memex_path = os.path.join("output", "memex")
 		if not os.path.exists(memex_path):

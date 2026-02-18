@@ -1,3 +1,5 @@
+static std::mutex g_mtx;
+
 class BenchmarkTimer {
 	private:
 		std::chrono::high_resolution_clock::time_point start_time;
@@ -27,7 +29,7 @@ constexpr uint32_t BENCHMARK_RANDOM_SEED = 0xDEADBEEF;
 //
 // Now these can change!
 //
-constexpr size_t DEFAULT_WORKLIST_SIZE = 25ULL;
+constexpr size_t DEFAULT_WORKLIST_SIZE = /*WORKLIST_SIZE*/;
 
 constexpr size_t NBODY_WORKLIST_SIZE = DEFAULT_WORKLIST_SIZE;
 constexpr size_t MIN_NBODY_STEPS = 50'500UL;
@@ -100,10 +102,11 @@ inline void db_bench(std::vector<size_t>& ops) noexcept {
 			case 5:  tmp = testOpOnSample(DatabaseOperation{ &NextOp𝐓𝐲𝐩𝐞 }); break;
 			case 6:  tmp = testOpOnSample(DatabaseOperation{ &PreviousOp𝐓𝐲𝐩𝐞 }); break;
 			case 7:  tmp = testOpOnSample(DatabaseOperation{ &StatusOp𝐓𝐲𝐩𝐞 }); break;
-			//case 8:  tmp = testOpOnSample(DatabaseOperation{ &AddOp𝐓𝐲𝐩𝐞, 𝐀𝐥𝐥𝐨𝐜𝐓𝐲𝐩𝐞( AddOp, alloc1, &AddOp𝐓𝐲𝐩𝐞, (AddOp{ 𝐀𝐥𝐥𝐨𝐜𝐓𝐲𝐩𝐞( Entry, alloc4, &Entry𝐓𝐲𝐩𝐞, (Entry{ Core::ListOps::s_list_create_3ᐸCStringᐳ([]() -> Core::CRope { const __CoreCpp::CChar* str = reinterpret_cast<const __CoreCpp::CChar*>("Bosque"); return Core::CRopeOps::s_crope_create(__CoreCpp::cbufferFromStringLiteral(0, 6, str)); }(), []() -> Core::CRope { const __CoreCpp::CChar* str = reinterpret_cast<const __CoreCpp::CChar*>("Yes"); return Core::CRopeOps::s_crope_create(__CoreCpp::cbufferFromStringLiteral(0, 3, str)); }(), []() -> Core::CRope { const __CoreCpp::CChar* str = reinterpret_cast<const __CoreCpp::CChar*>("Hybrid"); return Core::CRopeOps::s_crope_create(__CoreCpp::cbufferFromStringLiteral(0, 6, str)); }()) }) ) }) ) }); break;
-			//case 9:  tmp = testOpOnSample(DatabaseOperation{ &ModifyOp𝐓𝐲𝐩𝐞, 𝐀𝐥𝐥𝐨𝐜𝐓𝐲𝐩𝐞( ModifyOp, alloc1, &ModifyOp𝐓𝐲𝐩𝐞, (ModifyOp{ 𝐀𝐥𝐥𝐨𝐜𝐓𝐲𝐩𝐞( Entry, alloc4, &Entry𝐓𝐲𝐩𝐞, (Entry{ Core::ListOps::s_list_create_3ᐸCStringᐳ([]() -> Core::CRope { const __CoreCpp::CChar* str = reinterpret_cast<const __CoreCpp::CChar*>("Bosque"); return Core::CRopeOps::s_crope_create(__CoreCpp::cbufferFromStringLiteral(0, 6, str)); }(), []() -> Core::CRope { const __CoreCpp::CChar* str = reinterpret_cast<const __CoreCpp::CChar*>("Yes"); return Core::CRopeOps::s_crope_create(__CoreCpp::cbufferFromStringLiteral(0, 3, str)); }(), []() -> Core::CRope { const __CoreCpp::CChar* str = reinterpret_cast<const __CoreCpp::CChar*>("Hybrid"); return Core::CRopeOps::s_crope_create(__CoreCpp::cbufferFromStringLiteral(0, 6, str)); }()) }) ) }) ) }); break;
+			case 8:  tmp = testOpOnSample(DatabaseOperation( &AddOp𝐓𝐲𝐩𝐞, 𝐀𝐥𝐥𝐨𝐜𝐓𝐲𝐩𝐞( AddOp, alloc_MainᘏAddOp, (AddOp( 𝐀𝐥𝐥𝐨𝐜𝐓𝐲𝐩𝐞( Entry, alloc_MainᘏEntry, (Entry( Core::ListOps::s_list_create_3ᐸCStringᐳ([]() -> Core::CRope { const __CoreCpp::CChar* str = reinterpret_cast<const __CoreCpp::CChar*>("Bosque"); return Core::CRopeOps::s_crope_create(__CoreCpp::cbufferFromStringLiteral(0, 6, str)); }(), []() -> Core::CRope { const __CoreCpp::CChar* str = reinterpret_cast<const __CoreCpp::CChar*>("Yes"); return Core::CRopeOps::s_crope_create(__CoreCpp::cbufferFromStringLiteral(0, 3, str)); }(), []() -> Core::CRope { const __CoreCpp::CChar* str = reinterpret_cast<const __CoreCpp::CChar*>("Hybrid"); return Core::CRopeOps::s_crope_create(__CoreCpp::cbufferFromStringLiteral(0, 6, str)); }()) )) ) )) ) )); break;
+			case 9:  tmp = testOpOnSample(DatabaseOperation( &ModifyOp𝐓𝐲𝐩𝐞, 𝐀𝐥𝐥𝐨𝐜𝐓𝐲𝐩𝐞( ModifyOp, alloc_MainᘏModifyOp, (ModifyOp( 𝐀𝐥𝐥𝐨𝐜𝐓𝐲𝐩𝐞( Entry, alloc_MainᘏEntry, (Entry( Core::ListOps::s_list_create_3ᐸCStringᐳ([]() -> Core::CRope { const __CoreCpp::CChar* str = reinterpret_cast<const __CoreCpp::CChar*>("Bosque"); return Core::CRopeOps::s_crope_create(__CoreCpp::cbufferFromStringLiteral(0, 6, str)); }(), []() -> Core::CRope { const __CoreCpp::CChar* str = reinterpret_cast<const __CoreCpp::CChar*>("Yes"); return Core::CRopeOps::s_crope_create(__CoreCpp::cbufferFromStringLiteral(0, 3, str)); }(), []() -> Core::CRope { const __CoreCpp::CChar* str = reinterpret_cast<const __CoreCpp::CChar*>("Hybrid"); return Core::CRopeOps::s_crope_create(__CoreCpp::cbufferFromStringLiteral(0, 6, str)); }()) )) ) )) ) )); break;
 			case 10: tmp = testOpOnSample(DatabaseOperation{ &RemoveOp𝐓𝐲𝐩𝐞 }); break;
 			default: {
+				std::lock_guard lk(g_mtx);
 				std::cout << "value does not correspond to an existing db operation! - " << op << std::endl;
 				return ;
 			}
@@ -122,7 +125,8 @@ void db_run(std::vector<std::vector<size_t>>& worklist) noexcept {
 		db_bench(e);
 	}
 	timer.stop();
-
+	
+	std::lock_guard lk(g_mtx);
 	std::cout << "db time: " << timer.get_duration_ms() / 1000 << " seconds" << std::endl;
 	std::cout << "db memstats: " << std::endl;
 }
@@ -191,6 +195,7 @@ void raytrace_run(std::vector<std::vector<std::pair<size_t, size_t>>>& worklist)
 	}
 	timer.stop();
 
+	std::lock_guard lk(g_mtx);
 	std::cout << "raytrace time: " << timer.get_duration_ms() / 1000 << " seconds" << std::endl;
 	std::cout << "raytrace memstats: " << std::endl;
 }
@@ -227,6 +232,7 @@ void nbody_run(const std::vector<size_t>& worklist) noexcept  {
 	}
 	timer.stop();
 
+	std::lock_guard lk(g_mtx);
 	std::cout << "nbody time: " << timer.get_duration_ms() / 1000 << " seconds" << std::endl;
 	std::cout << "nbody memstats: " << std::endl;
 }
@@ -257,19 +263,24 @@ void mixed_run(std::vector<MixedOp>& worklist) noexcept {
 
 	int i = 0;
 	for(MixedOp& e : worklist) {
-		std::cout << i++ << std::endl;
 		switch(e.type) {
 			case OpType::NBODY:    nbody_bench(e.nbodywork); break;
 			case OpType::DB:       db_bench(e.dbbatch); break;
 			case OpType::RAYTRACE: raytrace_bench(e.raybatch); break;
 			default: {
+				std::lock_guard lk(g_mtx);
 				std::cout << "Unsupported op type!" << std::endl;
 				return;
 			}
 		}
+
+		std::lock_guard lk(g_mtx);
+		std::cout << "iteration " << i << std::endl;
+		i++;
 	}
 	timer.stop();
 
+	std::lock_guard lk(g_mtx);
 	std::cout << "mixed time: " << timer.get_duration_ms() / 1000 << " seconds" << std::endl;
 	std::cout << "mixed memstats: " << std::endl;
 }
@@ -325,7 +336,8 @@ void calculate_and_print_timing_stats() {
 			case OpType::RAYTRACE: op_name = "raytrace"; break;
 			default: op_name = "unknown"; break;
 		}
-		
+	
+		std::lock_guard lk(g_mtx);
 		std::cout << "===" << op_name << " Timing Statistics ===" << std::endl;
 		std::cout << "Samples: " << times.size() << std::endl;
 		std::cout << std::fixed << std::setprecision(6); // Full decimal precision
@@ -381,7 +393,8 @@ void calculate_and_print_server_stats() {
 	double p50 = get_percentile(0.50);
 	double p95 = get_percentile(0.95);
 	double p99 = get_percentile(0.99);
-	
+
+	std::lock_guard lk(g_mtx);
 	std::cout << "=== SERVER-WIDE Timing Statistics ===" << std::endl;
 	std::cout << "Total operations: " << all_times.size() << std::endl;
 	std::cout << std::fixed << std::setprecision(6); // Full decimal precision
@@ -400,8 +413,6 @@ void calculate_and_print_server_stats() {
 	std::cout << std::endl;	
 }
 
-static std::mutex g_mtx;
-
 void run(std::string mode, std::mt19937 gen) {
 	if(mode == "nbody") {
 		auto worklist = nbodyworklist_create(gen);
@@ -419,14 +430,13 @@ void run(std::string mode, std::mt19937 gen) {
 		auto worklist = mixedworklist_create(gen);
 		mixed_run(worklist);
 
-		std::lock_guard lk(g_mtx);
 		calculate_and_print_server_stats();
 	}
 	else {
+		std::lock_guard lk(g_mtx);
 		std::cout << "failed to run benchmark with flag " << mode << std::endl;
 	}
 
-	std::lock_guard lk(g_mtx);
 	calculate_and_print_timing_stats();
 }
 
@@ -442,7 +452,8 @@ __CoreCpp::Nat main() {
 	
 	for(size_t i = 0; i < nthds - 1; i++) {
 		thds[i] = std::thread([&]() {
-			gtl_info.initializeGC(allocs, sizeof(allocs) / sizeof(allocs[0]), collect);
+			gtl_info.initializeGC(allocs, sizeof(allocs) / sizeof(allocs[0])
+				, false, collect);
 			run(mode, gen);
 		});
 	}

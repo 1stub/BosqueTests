@@ -8,20 +8,20 @@ import re
 import operator as op
 from typing import Optional
 
-N_ITERATIONS = "/*N_ITERATIONS*/"
-N_THREADS    = "/*N_THREADS*/"
+TREE_DEPTH = "/*TREE_DEPTH*/"
+N_THREADS  = "/*N_THREADS*/"
 
 def cleanup(dir):
     if os.path.exists(dir):
         print("Deleting old cppout files!")
         shutil.rmtree(dir)
 
-def replace(dir, code, nitrs, nthds):
+def replace(dir, code, depth, nthds):
 	emitpath = os.path.join(dir, "emit.cpp")
 	emit = open(emitpath, 'r').read()
 
 	emit = re.sub(r'__CoreCpp::[a-zA-Z]+ main\(\) noexcept  {[^}]*}', code, emit, 0)
-	emit = emit.replace(N_ITERATIONS, str(nitrs))
+	emit = emit.replace(TREE_DEPTH, str(depth))
 	emit = emit.replace(N_THREADS, str(nthds))
 	
 	open(emitpath, 'w').write(emit)
@@ -41,8 +41,8 @@ def main():
 	bosque = os.path.join(cwd, "..", "..", "BosqueCore")
 	cpp = os.path.join(bosque, "bin", "src", "cmd", "analyzecpp.js")
 	cppout = os.path.join(cwd, "cppout")
-	src = os.path.join(cwd, "nbody.bsq")
-	n_iterations = 50000000
+	src = os.path.join(cwd, "bt.bsq")
+	tree_depth = 21
 	n_thds = 1
 
 	# Cleanup any leftover cpp code 
@@ -53,15 +53,15 @@ def main():
 		print(f"Found {nargs} args when max is 2!")
 		sys.exit(1)
 
-	if parse := parse_argv("nitrs="):
-		n_iterations = parse
+	if parse := parse_argv("depth="):
+		tree_depth = parse
 	
 	if parse := parse_argv("nthds="):
 		n_thds = parse
 
 	assert(int(n_thds) > 0)
 
-	print(f"Running nbody for {n_iterations} iterations on {n_thds} threads!\n")
+	print(f"Running bt with a max tree depth of {tree_depth} on {n_thds} threads!\n")
 
 	try:
 		subprocess.run(["node", cpp, src], check=True)
@@ -78,7 +78,7 @@ def main():
 		testcode = open(test_path, 'r').read()
 
 		os.chdir(cppout)
-		replace(cppout, testcode, n_iterations, n_thds)
+		replace(cppout, testcode, tree_depth, n_thds)
 
 		# We always run release build with memstats ON
 		subprocess.run(["make", "clean"], check=False)

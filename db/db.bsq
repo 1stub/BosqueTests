@@ -29,13 +29,13 @@ entity Format {
     invariant $vcount == $entries.map<Nat>(fn(ee) => ee.entries.size()).sum();
 
     method formatEntry(entry: Entry): CString {
-        let res, _ = this.entries.reduce<(|CString, List<CString>|)>((|'', entry.items|), fn(acc, fmt) => {
+        let res, _ = this.entries.reduce<(|CString, List<CString>|)>(fn(acc, fmt) => {
             let fargs = acc.1.firstK(fmt.entries.size());
             let rrest = acc.1.shiftK(fmt.entries.size());
 
             let formatted = CString::concat(acc.0, '%n;', fmt.format(fargs));
             return formatted, rrest;
-        });
+        }, (|'', entry.items|));
 
         return res;
     }
@@ -43,7 +43,7 @@ entity Format {
 
 datatype DatabaseOperation
 of
-NumRecordsOp { }
+| NumRecordsOp { }
 | EndOp { }
 | ListOp { }
 | GotoRecordOp { field ridx: Nat; }
@@ -111,9 +111,9 @@ entity Database {
                 return this.setIndex(0n);
             }
             else {
-                return this.setIndex($atidx);   
+                return this.setIndex($atidx);
             }
-            
+
         }
         else {
             if(atidx)@none {
@@ -133,7 +133,7 @@ entity Database {
     }
 
     method printRec(): CString, Database {
-        let tdb, tidx = this.ensureIndex(none); 
+        let tdb, tidx = this.ensureIndex(none);
 
         let entry = tdb.entries.get(tidx.imap.get(tidx.curr));
         return tdb.format.formatEntry(entry), tdb;
@@ -203,7 +203,7 @@ entity Database {
         return CString::concat(tidx.curr.toCString(), ' of ', this.entries.size().toCString());
     }
 
-    method processAdd(op: AddOp): Database 
+    method processAdd(op: AddOp): Database
         requires op.entry.items.size() == this.format.vcount;
     {
         return Database{ this.dbname, this.entries.pushBack(op.entry), this.format, none, none };
@@ -231,7 +231,7 @@ entity Database {
 
     method processDatabaseOperation(op: DatabaseOperation): CString, Database {
         match(op)@ {
-            NumRecordsOp => { return this.processNumRecords($op), this; }
+            | NumRecordsOp => { return this.processNumRecords($op), this; }
             | EndOp => { return this.processEnd($op); }
             | ListOp => { return this.processList($op); }
             | GotoRecordOp => { return this.processGotoRecord($op); }
@@ -245,19 +245,18 @@ entity Database {
     }
 
     method processDB(ops: List<DatabaseOperation>): CString, Database {
-        let res, tdb = ops.reduce<(|List<CString>, Database|)>((|List<CString>{}, this|), fn(acc, op) => {
+        let res, tdb = ops.reduce<(|List<CString>, Database|)>(fn(acc, op) => {
             let opstr, ndb = acc.1.processDatabaseOperation(op);
             return acc.0.pushBack(opstr), ndb;
-        });
+        }, (|List<CString>{}, this|));
 
         return CString::joinAll('%n;', res), tdb;
     }
 }
 
-
 function getSampleDB(): Database {
     let entries = List<Entry>{
-        Entry{List<CString>{'Bosque', 'Yes', 'Hybrid'}},
+        Entry{List<CString>{'Bosque', 'Yes', 'TBA'}},
         Entry{List<CString>{'C++', 'Yes', 'Compiled'}},
         Entry{List<CString>{'JavaScript', 'No', 'JIT'}},
         Entry{List<CString>{'Python', 'No', 'Interpreted'}},
@@ -335,17 +334,8 @@ function getSampleDB(): Database {
     return Database{none, entries, format, none, none};
 }
 
-function testOpOnSample(op: DatabaseOperation): CString {
-    let db = getSampleDB();
-    let res, _ = db.processDatabaseOperation(op);
-    
-    return res;
-}
-
-public function main(): Nat {
-    var tmp = testOpOnSample(NumRecordsOp { });
-
-    %% START WHILE LOOP
+public function testOpOnSample(op: DatabaseOperation): Nat {
+	var tmp = testOpOnSample(NumRecordsOp { });
 
     tmp = testOpOnSample(NumRecordsOp { });
     tmp = testOpOnSample(EndOp { });
@@ -357,8 +347,6 @@ public function main(): Nat {
     tmp = testOpOnSample(AddOp{Entry{List<CString>{'Bosque', 'Yes', 'Hybrid'}}  });
     tmp = testOpOnSample(ModifyOp{Entry{List<CString>{'Bosque', 'Yes', 'Hybrid'}} });
     tmp = testOpOnSample(RemoveOp{});
-
-    %% END WHILE LOOP
 
     return 1n;
 }
