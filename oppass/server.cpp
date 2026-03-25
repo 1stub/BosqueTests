@@ -13,7 +13,7 @@ __CoreCpp::Nat main() noexcept  {
     };
     
     std::vector<std::string> worklist;    
-    for (int i = 0; i < ITERATIONS; i++) {
+    for (int i = 0; i < /*N_ITERATIONS*/; i++) {
         for (const std::string& assembly : baseAssemblies) {
             worklist.push_back(assembly);
         }
@@ -76,8 +76,6 @@ __CoreCpp::Nat main() noexcept  {
             std::cout << "Invalid test name!" << std::endl;
         }
     }
-   
-    MEM_STATS_DUMP();
 
     return 0_n;
 }
